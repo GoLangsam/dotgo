@@ -6,6 +6,7 @@ import (
 	"github.com/golangsam/container/ccsafe/fs"
 )
 
+// PipeFsFileGlob forks received fsfiles into directories and files according to fs.MatchDisk
 func PipeFsFileGlob(
 	inp <-chan fs.FsFile,
 	dirS chan<- fs.FsFold,
