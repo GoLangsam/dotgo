@@ -49,11 +49,6 @@ Hint: It's use is intentionally kept so super-simple in order to allow ease of u
 
 ## Remarks
 
-### same name - different meanings
-When I chose the name `dotgo` I was not aware of the website [dotgo.eu](https://www.dotgo.eu/) and it's related events.
-Please accepty my apologies if this creates any kind of confusion in Your mind.
-And *Yes* - I may deserve blames and flames not having taken time to research the name beforehand ...
-
 ### `dotgo` uses `text/template`
 `dotgo` builds heavily on the `text/template` package from the standard library. For reasons to be shared later elswhere.
 
@@ -65,3 +60,8 @@ If so, there shall be a plain vanilla `dottxt` - also useful e.g. for `*.md`)
 ### `dothtml` - coming soon
 Now -as You might now- the standard library provides a second template package: `html/template`. Even so being isomorphic, it has other benefits when applied to xml/html.
 Thus, soon after having `dotgo` public and stable, there shall be it's companion `dothtml` - just using the other package.
+
+### same name - different meanings
+When I chose the name `dotgo` I was not aware of the website [dotgo.eu](https://www.dotgo.eu/) and it's related events.
+Please accepty my apologies if this creates any kind of confusion in Your mind.
+And *Yes* - I may deserve blames and flames not having taken time to research the name beforehand ...
