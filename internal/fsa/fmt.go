@@ -8,6 +8,7 @@ import (
 	"fmt"
 )
 
+// IfPrintAnalysis prints the analyses, iff flag is true
 func IfPrintAnalysis(flag bool, suffix string, aS ...*Analysis) {
 	if flag {
 		for _, a := range aS {

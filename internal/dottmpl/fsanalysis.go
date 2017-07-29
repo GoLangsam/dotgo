@@ -16,6 +16,10 @@ const (
 	aDot = fs.Dot // just a "."
 )
 
+// DoIt performs it all:
+//  - file system analysis (where to look)
+//  - collection of metadata from templates
+//  - execution of all relevant templates
 func DoIt() {
 	data := NewData(aDot)
 	tmpl := NewTemplate(aDot)

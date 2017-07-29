@@ -8,6 +8,7 @@ import (
 	"fmt"
 )
 
+// IfPrintTemplate prints the template names, iff flag is true
 func IfPrintTemplate(flag bool, tmpl Template, prefix string) {
 	if flag {
 		fmt.Println(prefix + " Template Names:\t")
@@ -15,6 +16,7 @@ func IfPrintTemplate(flag bool, tmpl Template, prefix string) {
 	}
 }
 
+// IfPrintNames prints the names of the templates, iff flag is true
 func IfPrintNames(flag bool, tmpl Template, prefix string) {
 	if flag {
 		for _, name := range Names(tmpl) {

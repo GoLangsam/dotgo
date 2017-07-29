@@ -8,6 +8,7 @@ import (
 	"github.com/golangsam/container/ccsafe/fs"
 )
 
+// Kind represents the kind of some analysis
 type Kind int
 
 const (

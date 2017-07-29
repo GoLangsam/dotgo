@@ -8,6 +8,7 @@ import (
 	"github.com/golangsam/container/ccsafe/fs"
 )
 
+// AnalyseDown returns the analysis recursing into any subdirs rooted at *Fold without
 func (a *Analysis) AnalyseDown(dir *fs.FsFold) *Analysis {
 	ca := a.Descend(Down, dir, dir.Recurse())
 

@@ -18,6 +18,7 @@ func IfPrintFsNameS(flag bool, nameS []FsName, prefix string) {
 	IfPrintFsBaseS(flag, dummy, prefix)
 }
 
+// IfPrintFsBaseS prints the base names, iff flag is true
 func IfPrintFsBaseS(flag bool, fsBaseS fs.FsBaseS, prefix string) {
 	if flag {
 		baseS := fsc.DoneFsBaseSlice(fsc.PipeFsBaseFunc(fsc.ChanFsBase(fsBaseS...), fsc.FsBasePrintFunc(prefix+"\t")))
@@ -25,6 +26,7 @@ func IfPrintFsBaseS(flag bool, fsBaseS fs.FsBaseS, prefix string) {
 	}
 }
 
+// IfPrintFsFileS prints the file names, iff flag is true
 func IfPrintFsFileS(flag bool, fsFileS fs.FsFileS, prefix string) {
 	if flag {
 		fileS := fsc.DoneFsFileSlice(fsc.PipeFsFileFunc(fsc.ChanFsFile(fsFileS...), fsc.FsFilePrintFunc(prefix+"\t")))
@@ -32,6 +34,7 @@ func IfPrintFsFileS(flag bool, fsFileS fs.FsFileS, prefix string) {
 	}
 }
 
+// IfPrintFsFoldS prints the fold names, iff flag is true
 func IfPrintFsFoldS(flag bool, fsFoldS fs.FsFoldS, prefix string) {
 	if flag {
 		foldS := fsc.DoneFsFoldSlice(fsc.PipeFsFoldFunc(fsc.ChanFsFold(fsFoldS...), fsc.FsFoldPrintFunc(prefix+"\t")))
