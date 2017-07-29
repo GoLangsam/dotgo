@@ -59,7 +59,8 @@ And *Yes* - I may deserve blames and flames not having taken time to research th
 
 ### `dottxt` - currently: No Need
 And, as it's 'go awarness' can be switched off, there is currently no need for a twin such as `dottxt`.
-(This may change, if we feel need to add awarness for go specific stuff such as packages or vendoring. If so, there shall be a plain vanilly `dottxt`)
+(This may change, if we feel need to add awarness for go specific stuff such as packages or vendoring.
+If so, there shall be a plain vanilla `dottxt` - also useful e.g. for `*.md`)
 
 ### `dothtml` - coming soon
 Now -as You might now- the standard library provides a second template package: `html/template`. Even so being isomorphic, it has other benefits when applied to xml/html.
