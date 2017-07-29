@@ -10,6 +10,7 @@ import (
 	"github.com/golangsam/container/ccsafe/dotpath"
 )
 
+// IfPrintFlagArgs prints the arguments, iff flag is true
 func IfPrintFlagArgs(flag bool, args ...string) {
 	if flag {
 		ds := dotpath.FilePathS(args...)

@@ -35,9 +35,10 @@ func tempdir() interface{} {
 // os.Getwd as TempFunc - silent on error
 func getwd() interface{} {
 	wd, err := os.Getwd()
-	if err != nil {
+	switch {
+	case err != nil:
 		return ""
-	} else {
+	default:
 		return wd
 	}
 }
@@ -45,9 +46,10 @@ func getwd() interface{} {
 // os.Hostname as TempFunc - silent on error
 func hostname() interface{} {
 	hn, err := os.Hostname()
-	if err != nil {
+	switch {
+	case err != nil:
 		return ""
-	} else {
+	default:
 		return hn
 	}
 }
@@ -59,6 +61,7 @@ func memstats() interface{} {
 	return *stats
 }
 
+// Funcs contains the FuncMap providied and used by this package
 var Funcs = template.FuncMap{
 	"null":     null,     // returns an empty string - useful to pipe method-results away
 	"memstats": memstats, // runtime.MemStats - refreshed on each call

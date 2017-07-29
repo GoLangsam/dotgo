@@ -9,6 +9,7 @@ import (
 	//"github.com/golangsam/dotgo/internal/htmltmpl" // adapter to "html/template"
 )
 
+// Template represents the template used (html or text)
 type Template interface {
 	t.Template
 }

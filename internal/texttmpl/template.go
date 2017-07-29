@@ -31,10 +31,12 @@ type Template interface {
 	ExecuteTemplate(wr io.Writer, name string, data interface{}) error
 }
 
+// New returns a new template with funcmap attached and delimiters set
 func New(name string) *template.Template {
 	return template.New(name).Funcs(Funcs).Delims(tmplL, tmplR)
 }
 
+// Names returns the sorted names of the templates referenced by tmpl
 func Names(tmpl Template) (names []string) {
 	tS := tmpl.Templates()
 	sort.Slice(tS, func(i, j int) bool { return (tS[i].Name() < tS[j].Name()) })
@@ -44,6 +46,7 @@ func Names(tmpl Template) (names []string) {
 	return
 }
 
+// Meta returns the meta-text extraced from text
 func Meta(text string) (string, error) {
 	return ds.Extract(text, metaL, metaR) // extract meta-data
 }

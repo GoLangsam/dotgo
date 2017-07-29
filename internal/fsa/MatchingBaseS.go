@@ -8,6 +8,7 @@ import (
 	"github.com/golangsam/container/ccsafe/fs"
 )
 
+// MatchingBaseS returns the base names matching the patterns
 func (a *Analysis) MatchingBaseS(files fs.FsFileS, patterns ...*fs.Pattern) (nameS fs.FsBaseS) {
 	for _, file := range files {
 		if ok, _ := file.BaseMatches(patterns...); ok { // ignore errors

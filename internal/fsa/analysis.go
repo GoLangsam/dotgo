@@ -11,11 +11,15 @@ import (
 type Kind int
 
 const (
+	// Root represents the root of some Analysis
 	Root Kind = iota
+	// Flat represents a flat analysis - no descend into subirs
 	Flat
+	// Down represents a descend into the entire tree of subirs
 	Down
 )
 
+// Analysis represents the result of a file system analysis
 type Analysis struct {
 	*fs.FsFold              // folder / directory
 	Kind       Kind         // kind of analysis
@@ -39,8 +43,7 @@ func (a *Analysis) Reset() *Analysis {
 	return a
 }
 
-// Descend & inherit
-
+// Descend returns the analsysis of folder d & inherits it's subdirs to parent
 func (a *Analysis) Descend(kind Kind, d *fs.FsFold, recurse bool) *Analysis {
 	var ca *Analysis
 	if recurse && !d.Recurse() {

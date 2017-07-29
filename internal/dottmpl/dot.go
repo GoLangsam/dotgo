@@ -27,6 +27,7 @@ type Dot interface {
 	//SeeNotOk(myName, myThing string, ok bool, complain string) bool
 }
 
+// NewData returns a fresh named dot
 func NewData(name string) *dot.Dot {
 	return dot.New(name)
 }
@@ -47,18 +48,23 @@ func flagPrintErrors(data *dot.Dot, prefix string) bool {
 	}
 }
 
+// HaveErrors returns the subnode with errors nad true, iff any - or nil, false
 func HaveErrors(d *dot.Dot) (*dot.Dot, bool) {
-	if _, ok := d.Fetch(ErrorID); ok {
+	_, ok := d.Fetch(ErrorID)
+	switch {
+	case ok:
 		return d.G(ErrorID), true
-	} else {
+	default:
 		return nil, false
 	}
 }
 
+// SeeError returns true iff err is non-nil (after registering it)
 func SeeError(data *dot.Dot, err error, prefix string) bool {
-	if err == nil {
+	switch {
+	case err == nil:
 		return false
-	} else {
+	default:
 		data.SeeError("DotGo", prefix, err)
 		fmt.Println(prefix+":\t"+ErrorName+"\t", err.Error())
 		return true
