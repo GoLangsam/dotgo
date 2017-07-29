@@ -10,9 +10,12 @@ import (
 	"github.com/golangsam/container/ccsafe/dot"
 )
 
+// constants borrowed from package `dot`
 const (
+	// ErrorName is the name of a node-type error
 	ErrorName = dot.ErrorName
-	ErrorID   = dot.ErrorID
+	// ErrorID is the ID of of a node of type error
+	ErrorID = dot.ErrorID
 )
 
 // Dot defines what is used from "container/ccsafe/dot" to register errors
@@ -32,6 +35,7 @@ func NewData(name string) *dot.Dot {
 	return dot.New(name)
 }
 
+// flagPrintDataTree prints the data tree, iff flag is true
 func flagPrintDataTree(flag bool, data Dot, prefix string) {
 	if flag {
 		fmt.Println(prefix + "\t<- " + "Data: >>")
@@ -39,11 +43,14 @@ func flagPrintDataTree(flag bool, data Dot, prefix string) {
 	}
 }
 
+// flagPrintErrors prints the error(s), iff any
 func flagPrintErrors(data *dot.Dot, prefix string) bool {
-	if e, ok := HaveErrors(data); ok {
+	e, ok := HaveErrors(data)
+	switch {
+	case ok:
 		flagPrintDataTree(true, e, ErrorName)
 		return true
-	} else {
+	default:
 		return false
 	}
 }

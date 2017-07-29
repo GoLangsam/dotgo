@@ -10,6 +10,8 @@ import (
 )
 
 // IfPrint helpers - using fsc: Fs Channels
+
+// IfPrintFsNameS is a deprechated dummy
 func IfPrintFsNameS(flag bool, nameS []FsName, prefix string) {
 	dummy := fs.FsBaseS{} // TODO(apa): obsolete this dummy
 	for _, name := range nameS {
