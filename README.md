@@ -2,6 +2,9 @@
 An agnostic tool to create `*.go` sources (and other text) given some template(s) - generic types made easy.
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
+[![Go Report Card](https://goreportcard.com/badge/github.com/GoLangsam/dotgo)](https://goreportcard.com/report/github.com/GoLangsam/dotgo)
+[![Build Status](https://travis-ci.org/GoLangsam/dotgo.svg?branch=master)](https://travis-ci.org/GoLangsam/dotgo)
+[![GoDoc](https://godoc.org/github.com/GoLangsam/dotgo?status.svg)](https://godoc.org/github.com/GoLangsam/dotgo)
 
 ## Simplicity ain't easy
 
