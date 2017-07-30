@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
-	_ = cancel.Canceler() // TODO pass ctx on
+	ctx, _ := cancel.WithCancel()
+	_ = ctx // TODO: Pass ctx down
 	doit.DoIt()
 }
