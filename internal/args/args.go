@@ -19,8 +19,8 @@ func ToFolds(args ...string) fs.FsFoldS {
 
 // toFolds converts pathS to fs.FsFoldS - with or without recurse flag
 func toFoldS(pathS ...*dotpath.DotPath) (dirS fs.FsFoldS) {
-	for _, dotPath := range pathS {
-		dirS = append(dirS, dotFoldS(dotPath)...)
+	for i := range pathS {
+		dirS = append(dirS, dotFoldS(pathS[i])...)
 	}
 	return dirS
 }
@@ -30,23 +30,25 @@ func dotFoldS(dotPath *dotpath.DotPath) (dirS fs.FsFoldS) {
 
 	var waydown = make(map[string]bool)
 
-	for _, p := range dotPath.PathS() {
-		waydown[p] = false
+	dpS := dotPath.PathS()
+	for i := range dpS {
+		waydown[dpS[i]] = false
 	}
 
-	for _, p := range dotPath.RecursePathS() {
-		if _, ok := waydown[p]; ok {
-			waydown[p] = true
+	rpS := dotPath.RecursePathS()
+	for i := range rpS {
+		if _, ok := waydown[rpS[i]]; ok {
+			waydown[rpS[i]] = true
 		} else {
-			dirS = append(dirS, fs.Recurse(p))
+			dirS = append(dirS, fs.Recurse(rpS[i]))
 		}
 	}
 
-	for _, p := range dotPath.PathS() {
-		if waydown[p] {
-			dirS = append(dirS, fs.Recurse(p))
+	for i := range dpS {
+		if waydown[dpS[i]] {
+			dirS = append(dirS, fs.Recurse(dpS[i]))
 		} else {
-			dirS = append(dirS, fs.NotDown(p))
+			dirS = append(dirS, fs.NotDown(dpS[i]))
 		}
 	}
 

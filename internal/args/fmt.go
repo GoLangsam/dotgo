@@ -15,13 +15,13 @@ func IfPrintFlagArgs(flag bool, args ...string) {
 	if flag {
 		ds := dotpath.FilePathS(args...)
 		fmt.Println("===============================================================================")
-		for _, dp := range ds {
-			dp.Print()
+		for i := range ds {
+			ds[i].Print()
 			fmt.Println("-------------------------------------------------------------------------------")
 		}
 		as := ToFolds(args...)
-		for _, a := range as {
-			fmt.Println(a.String(), "\t", a.Recurse())
+		for i := range as {
+			fmt.Println(as[i].String(), "\t", as[i].Recurse())
 		}
 		fmt.Println("===============================================================================")
 	}
