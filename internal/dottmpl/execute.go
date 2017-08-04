@@ -13,11 +13,11 @@ func (t toDo) Execute() {
 
 	flagOpen(px_, "execute")
 
-	for _, tree := range t.dir.SubDirS { // should be just one
-		tree.FsBaseS = append(t.dir.FsBaseS, tree.FsBaseS...)
-		a.IfPrintAnalysis(pwd, "<- Target Directory", tree)
-		flagPrintAnalysisTree(pwd, tree, "<- Target")
-		todo := doIt(t.data, t.tmpl, tree)
+	for i := range t.dir.SubDirS { // should be just one
+		t.dir.SubDirS[i].FsBaseS = append(t.dir.FsBaseS, t.dir.SubDirS[i].FsBaseS...)
+		a.IfPrintAnalysis(pwd, "<- Target Directory", t.dir.SubDirS[i])
+		flagPrintAnalysisTree(pwd, t.dir.SubDirS[i], "<- Target")
+		todo := doIt(t.data, t.tmpl, t.dir.SubDirS[i])
 		todo.CollectDown()
 	}
 
@@ -29,10 +29,10 @@ func (t toDo) CollectDown() {
 		t.CollectFold()
 	}
 
-	for _, sub := range t.dir.SubDirS {
-		sub.FsFileS = append(t.dir.FsFileS, sub.FsFileS...)
-		sub.FsBaseS = append(t.dir.FsBaseS, sub.FsBaseS...)
-		todo := doIt(t.data, t.tmpl, sub)
+	for i := range t.dir.SubDirS {
+		t.dir.SubDirS[i].FsFileS = append(t.dir.FsFileS, t.dir.SubDirS[i].FsFileS...)
+		t.dir.SubDirS[i].FsBaseS = append(t.dir.FsBaseS, t.dir.SubDirS[i].FsBaseS...)
+		todo := doIt(t.data, t.tmpl, t.dir.SubDirS[i])
 		todo.CollectDown()
 	}
 }
@@ -48,8 +48,8 @@ func (t toDo) CollectFold() {
 		flagPrintTemplate(pxt, todo.tmpl, todo.dir.String()+" - Execution")
 
 		names := nameSnotEmpty(todo.dir.FsBaseS)
-		for _, name := range names {
-			name := name.String()
+		for i := range names {
+			name := names[i].String()
 			file := fold.G(name)
 			todo := doIt(file, todo.tmpl, todo.dir)
 			todo.CollectDataS()

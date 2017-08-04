@@ -77,8 +77,8 @@ func analyseFS(argS fs.FsFoldS) *a.Analysis {
 }
 
 func toNameS(files fs.FsBaseS) (nameS []f.FsName) {
-	for _, name := range files { // convert to f.FsName
-		nameS = append(nameS, name.BaseLessExt()) // less ext !
+	for i := range files { // convert to f.FsName
+		nameS = append(nameS, files[i].BaseLessExt()) // less ext !
 	}
 	return nameS
 }
