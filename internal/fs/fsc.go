@@ -14,8 +14,8 @@ import (
 // IfPrintFsNameS is a deprechated dummy
 func IfPrintFsNameS(flag bool, nameS []FsName, prefix string) {
 	dummy := fs.FsBaseS{} // TODO(apa): obsolete this dummy
-	for _, name := range nameS {
-		dummy = append(dummy, name.(*fs.FsBase))
+	for i := range nameS {
+		dummy = append(dummy, nameS[i].(*fs.FsBase))
 	}
 	IfPrintFsBaseS(flag, dummy, prefix)
 }
