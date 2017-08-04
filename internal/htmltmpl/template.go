@@ -40,8 +40,8 @@ func New(name string) *template.Template {
 func Names(tmpl Template) (names []string) {
 	tS := tmpl.Templates()
 	sort.Slice(tS, func(i, j int) bool { return (tS[i].Name() < tS[j].Name()) })
-	for _, t := range tS {
-		names = append(names, t.Name())
+	for i := range tS {
+		names = append(names, tS[i].Name())
 	}
 	return
 }
