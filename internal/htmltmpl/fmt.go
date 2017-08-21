@@ -19,8 +19,9 @@ func IfPrintTemplate(flag bool, tmpl Template, prefix string) {
 // IfPrintNames prints the names of the templates, iff flag is true
 func IfPrintNames(flag bool, tmpl Template, prefix string) {
 	if flag {
-		for _, name := range Names(tmpl) {
-			fmt.Println(prefix + name + "\t")
+		nameS := Names(tmpl)
+		for i := range nameS {
+			fmt.Println(prefix + nameS[i] + "\t")
 		}
 	}
 }

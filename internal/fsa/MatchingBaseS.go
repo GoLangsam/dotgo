@@ -10,9 +10,9 @@ import (
 
 // MatchingBaseS returns the base names matching the patterns
 func (a *Analysis) MatchingBaseS(files fs.FsFileS, patterns ...*fs.Pattern) (nameS fs.FsBaseS) {
-	for _, file := range files {
-		if ok, _ := file.BaseMatches(patterns...); ok { // ignore errors
-			nameS = append(nameS, file.Base())
+	for i := range files {
+		if ok, _ := files[i].BaseMatches(patterns...); ok { // ignore errors
+			nameS = append(nameS, files[i].Base())
 		}
 	}
 	return nameS

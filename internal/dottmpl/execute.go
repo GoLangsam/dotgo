@@ -55,8 +55,9 @@ func (t toDo) CollectFold() {
 			todo.CollectDataS()
 			flagPrintDataTree(pxd, todo.data, todo.dir.String())
 			if !flagPrintErrors(file, "Collect "+t.dir.String()+" for name "+name+":") {
-				for _, dot := range file.DownS() {
-					todo := doIt(dot, todo.tmpl, todo.dir)
+				dotS := file.DownS()
+				for i := range dotS {
+					todo := doIt(dotS[i], todo.tmpl, todo.dir)
 					todo.ExecuteTmpl(name)
 				}
 			}

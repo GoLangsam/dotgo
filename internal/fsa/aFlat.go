@@ -39,10 +39,10 @@ func (a *Analysis) collectFlat(dir *fs.FsFold) *Analysis {
 
 func (a *Analysis) collectFlatSubDirS(dir *fs.FsFold) *Analysis {
 	dirFoldS := dir.SubDirS()
-	for _, dirName := range dirFoldS { // SubDirS returned all
-		if dirName.IsFold() { // evident - kept for symmetry with ...Down
-			downDir := dirName //
-			ca := a            // no Descend(downDir, true)
+	for i := range dirFoldS { // SubDirS returned all
+		if dirFoldS[i].IsFold() { // evident - kept for symmetry with ...Down
+			downDir := dirFoldS[i] //
+			ca := a                // no Descend(downDir, true)
 			ca = ca.takeFileS(downDir.FileS(extPatternS...)...)
 			// collectDownSubDirS(downDir) // recurse down // no need
 		}

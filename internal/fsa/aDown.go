@@ -39,9 +39,9 @@ func (a *Analysis) collectDown(dir *fs.FsFold) *Analysis {
 
 func (a *Analysis) collectDownSubDirS() *Analysis {
 	dirInfoS, _ := a.ReadDir()
-	for _, dirInfo := range dirInfoS { // ReadDir returned one level
-		if dirInfo.IsDir() {
-			downDir := fs.Recurse(a.JoinWith(dirInfo.Name()))
+	for i := range dirInfoS { // ReadDir returned one level
+		if dirInfoS[i].IsDir() {
+			downDir := fs.Recurse(a.JoinWith(dirInfoS[i].Name()))
 			ca := a.Descend(Down, downDir, true)
 			ca = ca.takeFileS(downDir.FileS(extPatternS...)...)
 			ca.collectDownSubDirS() // recurse down

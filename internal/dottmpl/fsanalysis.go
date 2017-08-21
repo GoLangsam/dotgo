@@ -108,8 +108,8 @@ func flagPrintAnalysisTree(flag bool, ca *a.Analysis, prefix string) {
 		if len(ca.FsFileS) < 1 && len(ca.FsBaseS) < 1 {
 			flagPrintString(flag, "----\t "+ca.String(), prefix)
 		}
-		for _, sa := range ca.SubDirS {
-			flagPrintAnalysisTree(flag, sa, prefix)
+		for i := range ca.SubDirS {
+			flagPrintAnalysisTree(flag, ca.SubDirS[i], prefix)
 		}
 		// println("===============================================================")
 	}

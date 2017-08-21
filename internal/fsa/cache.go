@@ -26,7 +26,7 @@ func closeCache() *fscache.FsCache {
 }
 
 func cacheFiles(files ...*fs.FsFile) {
-	for _, file := range files {
-		cacheFsFile <- file
+	for i := range files {
+		cacheFsFile <- files[i]
 	}
 }
