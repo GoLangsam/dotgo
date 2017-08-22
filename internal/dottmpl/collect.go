@@ -23,10 +23,10 @@ func (t toDo) CollectTmplS() {
 func (t toDo) CollectDataS() {
 	work, err := t.tmpl.Clone() // Duplicate tmpl!
 	t.data.SeeError("Collect: Clone: ", t.tmpl.Name(), err)
-	todo := doIt(t.data, work, t.dir)
-
-	for i := len(t.dir.FsFileS) - 1; i >= 0; i-- {
-		todo.CollectData(i)
+	if todo, ok := t.doIt(t.data, work, t.dir); ok {
+		for i := len(t.dir.FsFileS) - 1; i >= 0; i-- {
+			todo.CollectData(i)
+		}
 	}
 }
 

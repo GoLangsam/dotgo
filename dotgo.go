@@ -5,12 +5,11 @@
 package main
 
 import (
-	"github.com/golangsam/do/cli/cancel"
+	"fmt"
+
 	doit "github.com/golangsam/dotgo/internal/dottmpl"
 )
 
 func main() {
-	ctx, _ := cancel.WithCancel()
-	_ = ctx // TODO: Pass ctx down
-	doit.DoIt()
+	fmt.Println(doit.DoIt().Error())
 }

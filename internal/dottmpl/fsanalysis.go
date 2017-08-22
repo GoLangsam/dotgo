@@ -20,23 +20,29 @@ const (
 //  - file system analysis (where to look)
 //  - collection of metadata from templates
 //  - execution of all relevant templates
-func DoIt() {
+func DoIt() error {
 	data := NewData(aDot)
 	tmpl := NewTemplate(aDot)
+	var root *a.Analysis
+	doit := doIt(data, tmpl, root)
 
 	flagOpen(pm_, "analyse")
 	args.IfPrintFlagArgs(pma, flagArgs()...)
-	root := analyseFS(args.ToFolds(flagArgs()...)) // here the work is done
+	root = analyseFS(args.ToFolds(flagArgs()...)) // here the work is done
 
 	f.IfPrintFsFileS(pmf, root.FsFileS, "File:")
 	f.IfPrintFsBaseS(pmn, root.FsBaseS, "Base:")
 	flagClose(pm_)
 
-	todo := doIt(data, tmpl, root)
-	todo.Collect()
-	if !nox && !flagPrintErrors(data, "Prepare Main:") {
-		todo.Execute()
+	if todo, ok := doit.doIt(data, tmpl, root); ok {
+		todo.Collect()
+		if !nox && !flagPrintErrors(data, "Prepare Main:") {
+			todo.Execute()
+		}
 	}
+	err := doit.ctx.Err()
+	doit.can()
+	return err
 }
 
 // These variables support the file system analysis.

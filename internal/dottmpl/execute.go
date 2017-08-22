@@ -17,8 +17,9 @@ func (t toDo) Execute() {
 		t.dir.SubDirS[i].FsBaseS = append(t.dir.FsBaseS, t.dir.SubDirS[i].FsBaseS...)
 		a.IfPrintAnalysis(pwd, "<- Target Directory", t.dir.SubDirS[i])
 		flagPrintAnalysisTree(pwd, t.dir.SubDirS[i], "<- Target")
-		todo := doIt(t.data, t.tmpl, t.dir.SubDirS[i])
-		todo.CollectDown()
+		if todo, ok := t.doIt(t.data, t.tmpl, t.dir.SubDirS[i]); ok {
+			todo.CollectDown()
+		}
 	}
 
 	flagClose(px_)
@@ -32,8 +33,9 @@ func (t toDo) CollectDown() {
 	for i := range t.dir.SubDirS {
 		t.dir.SubDirS[i].FsFileS = append(t.dir.FsFileS, t.dir.SubDirS[i].FsFileS...)
 		t.dir.SubDirS[i].FsBaseS = append(t.dir.FsBaseS, t.dir.SubDirS[i].FsBaseS...)
-		todo := doIt(t.data, t.tmpl, t.dir.SubDirS[i])
-		todo.CollectDown()
+		if todo, ok := t.doIt(t.data, t.tmpl, t.dir.SubDirS[i]); ok {
+			todo.CollectDown()
+		}
 	}
 }
 
@@ -41,24 +43,27 @@ func (t toDo) CollectFold() {
 	exec, err := t.tmpl.Clone()
 	if !SeeError(t.data, err, "Clone Main:") {
 		fold := t.data.G(t.dir.String())
-		todo := doIt(fold, exec, t.dir)
+		todo, ok := t.doIt(fold, exec, t.dir)
+		if ok {
+			flagPrintString(pxl, todo.dir.String(), "Directory")
+			todo.CollectTmplS()
+			flagPrintTemplate(pxt, todo.tmpl, todo.dir.String()+" - Execution")
 
-		flagPrintString(pxl, todo.dir.String(), "Directory")
-		todo.CollectTmplS()
-		flagPrintTemplate(pxt, todo.tmpl, todo.dir.String()+" - Execution")
-
-		names := nameSnotEmpty(todo.dir.FsBaseS)
-		for i := range names {
-			name := names[i].String()
-			file := fold.G(name)
-			todo := doIt(file, todo.tmpl, todo.dir)
-			todo.CollectDataS()
-			flagPrintDataTree(pxd, todo.data, todo.dir.String())
-			if !flagPrintErrors(file, "Collect "+t.dir.String()+" for name "+name+":") {
-				dotS := file.DownS()
-				for i := range dotS {
-					todo := doIt(dotS[i], todo.tmpl, todo.dir)
-					todo.ExecuteTmpl(name)
+			names := nameSnotEmpty(todo.dir.FsBaseS)
+			for i := range names {
+				name := names[i].String()
+				file := fold.G(name)
+				if todo, ok := todo.doIt(file, todo.tmpl, todo.dir); ok {
+					todo.CollectDataS()
+					flagPrintDataTree(pxd, todo.data, todo.dir.String())
+					if !flagPrintErrors(file, "Collect "+t.dir.String()+" for name "+name+":") {
+						dotS := file.DownS()
+						for i := range dotS {
+							if todo, ok := todo.doIt(dotS[i], todo.tmpl, todo.dir); ok {
+								todo.ExecuteTmpl(name)
+							}
+						}
+					}
 				}
 			}
 			flagDot(px_)
