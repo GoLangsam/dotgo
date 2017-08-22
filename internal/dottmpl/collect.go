@@ -4,7 +4,7 @@
 
 package dottmpl
 
-// Collect: build (and optionally print) template & data
+// Collect - build (and optionally print) template & data
 func (t toDo) Collect() {
 	t.CollectTmplS()
 	t.CollectDataS()
@@ -12,14 +12,14 @@ func (t toDo) Collect() {
 	flagPrintDataTree(pmd, t.data, ".")
 }
 
-// CollectTmplS: add files first-to-last to given template
+// CollectTmplS - add files first-to-last to given template
 func (t toDo) CollectTmplS() {
 	for i := 0; i < len(t.dir.FsFileS); i++ {
 		t.CollectTmpl(i)
 	}
 }
 
-// CollectDataS: add files last-to-first to given data
+// CollectDataS - add files last-to-first to given data
 func (t toDo) CollectDataS() {
 	work, err := t.tmpl.Clone() // Duplicate tmpl!
 	t.data.SeeError("Collect: Clone: ", t.tmpl.Name(), err)
@@ -30,7 +30,7 @@ func (t toDo) CollectDataS() {
 	}
 }
 
-// CollectTmpl: add file to given template
+// CollectTmpl - add file to given template
 func (t toDo) CollectTmpl(i int) {
 	var err error
 	file := t.dir.FsFileS[i]
@@ -40,7 +40,7 @@ func (t toDo) CollectTmpl(i int) {
 	t.data.SeeError("CollectTmpl: Parse:", name, err)
 }
 
-// CollectData: extract meta data from file lookupData, parse and execute it
+// CollectData - extract meta data from file lookupData, parse and execute it
 func (t toDo) CollectData(i int) {
 	var err error
 	file := t.dir.FsFileS[i]
