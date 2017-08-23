@@ -8,6 +8,9 @@ import (
 	a "github.com/golangsam/dotgo/internal/fsa" // adapter to file system analysis
 )
 
+// Execute - given the current (= last) directory
+// CollectDown
+// while carrying known names of templates down.
 func (t toDo) Execute() {
 	//	ToDo.Assign(Data, namS...)
 
@@ -25,6 +28,9 @@ func (t toDo) Execute() {
 	flagClose(px_)
 }
 
+// CollectDown - CollectFold iff there are matching files,
+// and recurse CollectDown into all subdirs
+// while carrying known names of files and templates down.
 func (t toDo) CollectDown() {
 	if len(t.dir.MatchingFileS(t.dir.FsFileS, execPattern)) > 0 { // # have execPattern matches
 		t.CollectFold()
@@ -39,6 +45,10 @@ func (t toDo) CollectDown() {
 	}
 }
 
+// CollectFold - using a clone of the template,
+// collect data from each target template
+// of the current folder
+// and ExecuteTmpl with it's (shortened) name
 func (t toDo) CollectFold() {
 	exec, err := t.tmpl.Clone()
 	if !SeeError(t.data, err, "Clone Main:") {
@@ -69,9 +79,9 @@ func (t toDo) CollectFold() {
 			flagDot(px_)
 		}
 	}
-	// flagPrintDataTree(pxd, t.data, t.dir.String())
 }
 
+// ExecuteTempl - apply template 'name' and show/format/write result
 func (t toDo) ExecuteTmpl(name string) {
 	var err error
 	flagPrintString(pxl, "Apply", t.data.String()+"\t<- "+name+"\t")
