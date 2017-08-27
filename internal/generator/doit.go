@@ -29,16 +29,21 @@ func DoIt() error {
 	baseMatch := matchFunc(patterns[0])
 	execMatch := matchFunc(patterns[len(patterns)-1])
 
-	/*
-		tmplPile := MakePile(512, 128) // files (templates) to handle
-		basePile := MakePile(256, 64)  // templates to execute: basenames found
-		metaPile := MakePile(256, 64)  // templates with non-empty meta: apply in reverse order!
-		execPile := MakePile(256, 64)  // folder(s) for execution
-	*/
-	tmplPile := MakePile(0, 0) // files (templates) to handle
-	baseDict := lsm.New()      // templates to execute: basenames found
-	metaPile := MakePile(0, 0) // templates with non-empty meta: apply in reverse order!
-	execPile := MakePile(0, 0) // folder(s) for execution
+	tmplPile := MakePile(512, 128) // files (templates) to handle
+	baseDict := lsm.New()          // templates to execute: basenames found
+	metaPile := MakePile(256, 64)  // templates with non-empty meta: apply in reverse order!
+	execDict := lsm.New()          // folder(s) for execution
+
+	roottmpl := item{NewTemplate(aDot), tmplMatch} // TODO tmplMatch
+	_ = roottmpl
+	template := item{tmplPile, tmplMatch}
+	_ = template
+	metadata := item{metaPile, tmplMatch} // TODO metaMatch
+	_ = metadata
+	executes := item{baseDict, baseMatch}
+	_ = executes
+	writeout := item{execDict, execMatch}
+	_ = writeout
 
 	data := NewData(aDot)
 	tmpl := NewTemplate(aDot)
@@ -68,7 +73,7 @@ func DoIt() error {
 
 	if doit.ok() && !nox {
 		//	todo.Execute()
-		err := doit.exec(execS, tmplPile, tmplMatch, baseDict, baseMatch, metaPile, execPile, execMatch, lookupData) // Execute
+		err := doit.exec(execS, tmplPile, tmplMatch, baseDict, baseMatch, metaPile, execDict, execMatch, lookupData) // Execute
 		if err != nil && !doit.ifPrintErrors("Prepare Exec:") {                                                      // abort?
 			doit.can()
 			return err
@@ -131,7 +136,7 @@ func (doit *toDo) exec(
 	baseDict *lsm.LazyStringerMap,
 	baseMatch pathIs,
 	metaPile *Pile,
-	execPile *Pile,
+	execDict *lsm.LazyStringerMap,
 	execMatch pathIs,
 	lookupData func(string) string,
 ) error {
