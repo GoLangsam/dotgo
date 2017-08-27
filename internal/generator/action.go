@@ -104,7 +104,7 @@ func (t *toDo) itemParseT(
 	text := get(item)
 	name := nameLessExt(item)
 
-	t.tmpl, err = t.tmpl.New(name).Parse(text) // Parse the data
+	t.tmpl, err = t.tmpl.Make(name, text) // Parse the data
 	t.data.SeeError("CollectTmpl: Parse:", name, err)
 
 	meta, err := Meta(text) // extract meta-data
@@ -126,7 +126,7 @@ func (t *toDo) itemParseM(
 	meta, err := Meta(text) // extract meta-data
 	t.data.SeeError("CollectMeta: Extract:", name, err)
 
-	t.tmpl, err = t.tmpl.New(name).Parse(meta) // Parse the meta-data
+	t.tmpl, err = t.tmpl.Make(name, meta) // Parse the meta-data
 	t.data.SeeError("CollectMeta: Parse:", name, err)
 
 	_, err = Apply(t.data, t.tmpl, name)

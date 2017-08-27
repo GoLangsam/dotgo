@@ -17,7 +17,8 @@ func Write(data Dot, filename string, byteS []byte) error {
 // FileName resolves name as a template, executed against data
 func FileName(data Dot, name string) string {
 	fileName := name
-	if tmpl, err := NewTemplate("FileName").Parse(fileName); err == nil {
+	template := NewTemplate("FileName")
+	if tmpl, err := template.Make("FileName", fileName); err == nil {
 		if byteS, err := Apply(data, tmpl, "FileName"); err == nil {
 			fileName = string(byteS)
 		} else {

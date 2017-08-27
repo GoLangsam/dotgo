@@ -10,7 +10,7 @@ import (
 )
 
 // Template represents the template used (html or text)
-type Template interface {
+type Template struct {
 	t.Template
 }
 
@@ -21,7 +21,19 @@ func flagPrintTemplate(flag bool, tmpl Template, prefix string) {
 // NewTemplate returns a new template
 // with funcmap attached and delimiters set
 func NewTemplate(name string) Template {
-	return t.New(name)
+	return Template{t.New(name)}
+}
+
+// Make returns a fresh Template made from parsing body
+func (template Template) Make(name, body string) (new Template, err error) {
+	tmpl, err := t.New(name).Parse(body)
+	new = Template{tmpl}
+	return new, err
+}
+
+// Close - pretend to be a Closer (<=> an io.Closer)
+func (template Template) Close() error {
+	return nil
 }
 
 // Meta returns the meta-text extraced from text
