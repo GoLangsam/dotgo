@@ -10,18 +10,17 @@ import (
 	"github.com/golangsam/container/ccsafe/lsm"
 )
 
-func (t *toDo) walkFS(
+func (t *toDo) dirSWalker(
 	dot bool,
 	inp dirS,
-	out *Pile,
-	iff pathIs,
+	out filler,
 ) func() {
 
 	return func() {
 
-		defer out.Close()
+		defer out.stuff.Close()
 
-		fh := pathPiler(iff, out) // => populate tmplPile
+		fh := pathPiler(out.match, out.stuff.(*Pile)) // => populate tmplPile
 		for i := 0; i < len(inp) && t.ok(); i++ {
 			flagDot(dot, dotWalk) // ...
 
@@ -31,9 +30,56 @@ func (t *toDo) walkFS(
 	}
 }
 
-func (t *toDo) fanOut(
+func (t *toDo) pileWalker(
 	dot bool,
 	inp *Pile,
+	out ...maker,
+) func() {
+
+	return func() {
+
+		defer func() {
+			for i := range out {
+				out[i].stuff.Close()
+			}
+		}()
+		for item, ok := inp.Iter(); ok && t.ok(); item, ok = inp.Next() {
+			flagDot(dot, dotFOut) // ...
+			for i := range out {
+				out[i].do(item)
+			}
+		}
+	}
+}
+
+func (t *toDo) dictWalker(
+	dot bool,
+	inp *lsm.LazyStringerMap,
+	out ...maker,
+) func() {
+
+	return func() {
+
+		defer func() {
+			for i := range out {
+				out[i].stuff.Close()
+			}
+		}()
+		for _, item := range inp.S() {
+			if !t.ok() {
+				return // bail out
+			}
+			flagDot(dot, dotFOut) // ...
+			for i := range out {
+				out[i].do(item)
+			}
+		}
+	}
+}
+
+func (t *toDo) fanOut(
+	dot bool,
+	inp filler,
 	out *lsm.LazyStringerMap,
 	iff pathIs,
 	dup *Pile,
@@ -42,8 +88,8 @@ func (t *toDo) fanOut(
 	return func() {
 
 		defer dup.Close()
-
-		for item, ok := inp.Iter(); ok && t.ok(); item, ok = inp.Next() {
+		pile := inp.stuff.(*Pile)
+		for item, ok := pile.Iter(); ok && t.ok(); item, ok = pile.Next() {
 			flagDot(dot, dotFOut) // ...
 			t.itemFanOut(item, out, iff, dup)
 		}
@@ -131,4 +177,24 @@ func (t *toDo) itemParseM(
 
 	_, err = Apply(t.data, t.tmpl, name)
 	t.data.SeeError("CollectMeta: Apply:", name, err)
+}
+
+func (t *toDo) metaParser(
+	get func(string) string,
+) nameDo {
+	return func(item string) {
+
+		var err error
+		text := get(item)
+		name := nameLessExt(item) + ".meta"
+
+		meta, err := Meta(text) // extract meta-data
+		t.data.SeeError("CollectMeta: Extract:", name, err)
+
+		t.tmpl, err = t.tmpl.Make(name, meta) // Parse the meta-data
+		t.data.SeeError("CollectMeta: Parse:", name, err)
+
+		_, err = Apply(t.data, t.tmpl, name)
+		t.data.SeeError("CollectMeta: Apply:", name, err)
+	}
 }

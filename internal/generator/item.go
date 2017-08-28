@@ -4,17 +4,25 @@
 
 package gen
 
-// Closer mimics io.Closer - in order to avoid explicit dependency
+// Closer mimics io.Closer - definded locally in order to avoid explicit dependency
 type Closer interface {
 	Close() error
 }
 
-type item struct {
-	stuff Closer // any collection which implements Closer
+type filler struct {
 	match pathIs // a filter
+	stuff Closer // any collection which implements Closer
 }
 
-type doit struct {
-	item        // any collection which implements Closer
-	do   pathDo // what to do to it
+func (f filler) Close() error {
+	return f.stuff.Close()
+}
+
+type maker struct {
+	stuff Closer // any collection which implements Closer
+	do    nameDo // what to do to it
+}
+
+func (m maker) Close() error {
+	return m.stuff.Close()
 }

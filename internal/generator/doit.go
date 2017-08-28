@@ -18,6 +18,10 @@ type dirS []struct {
 	Recurse bool
 }
 
+func (d dirS) Close() error {
+	return nil
+}
+
 // DoIt performs it all:
 //  - file system analysis (where to look)
 //  - collection of metadata from templates
@@ -28,22 +32,14 @@ func DoIt() error {
 	tmplMatch := matchFunc(patterns...)
 	baseMatch := matchFunc(patterns[0])
 	execMatch := matchFunc(patterns[len(patterns)-1])
+	fakeMatch := matchBool(true)
 
-	tmplPile := MakePile(512, 128) // files (templates) to handle
-	baseDict := lsm.New()          // templates to execute: basenames found
-	metaPile := MakePile(256, 64)  // templates with non-empty meta: apply in reverse order!
-	execDict := lsm.New()          // folder(s) for execution
-
-	roottmpl := item{NewTemplate(aDot), tmplMatch} // TODO tmplMatch
+	roottmpl := filler{fakeMatch, NewTemplate(aDot)} // TODO tmplMatch
 	_ = roottmpl
-	template := item{tmplPile, tmplMatch}
-	_ = template
-	metadata := item{metaPile, tmplMatch} // TODO metaMatch
-	_ = metadata
-	executes := item{baseDict, baseMatch}
-	_ = executes
-	writeout := item{execDict, execMatch}
-	_ = writeout
+	tmplfile := filler{tmplMatch, MakePile(512, 128)} // files (templates) to handle
+	metadata := filler{fakeMatch, MakePile(256, 64)}  // templates with non-empty meta: apply in reverse order!
+	executes := filler{baseMatch, lsm.New()}          // templates to execute: basenames found
+	writeout := filler{execMatch, lsm.New()}          // folder(s) for execution
 
 	data := NewData(aDot)
 	tmpl := NewTemplate(aDot)
@@ -63,9 +59,12 @@ func DoIt() error {
 	prepS := pathS[:split]  // - prepare all but last
 	execS := pathS[split:]  // - execute only last
 
+	metaParser := maker{metadata.stuff, doit.metaParser(lookupData)}
+	_ = metaParser
+
 	if doit.ok() {
-		err := doit.prep(prepS, tmplPile, tmplMatch, baseDict, baseMatch, metaPile, lookupData) // Analyse
-		if err != nil && !doit.ifPrintErrors("Prepare Main:") {                                 // abort?
+		err := doit.prep(prepS, tmplfile, executes, metadata, lookupData) // Analyse
+		if err != nil && !doit.ifPrintErrors("Prepare Main:") {           // abort?
 			doit.can()
 			return err
 		}
@@ -73,8 +72,8 @@ func DoIt() error {
 
 	if doit.ok() && !nox {
 		//	todo.Execute()
-		err := doit.exec(execS, tmplPile, tmplMatch, baseDict, baseMatch, metaPile, execDict, execMatch, lookupData) // Execute
-		if err != nil && !doit.ifPrintErrors("Prepare Exec:") {                                                      // abort?
+		err := doit.exec(execS, tmplfile, executes, metadata, writeout, lookupData) // Execute
+		if err != nil && !doit.ifPrintErrors("Prepare Exec:") {                     // abort?
 			doit.can()
 			return err
 		}
@@ -87,11 +86,9 @@ func DoIt() error {
 
 func (doit *toDo) prep(
 	prepS dirS,
-	tmplPile *Pile,
-	tmplMatch pathIs,
-	baseDict *lsm.LazyStringerMap,
-	baseMatch pathIs,
-	metaPile *Pile,
+	template filler,
+	executes filler,
+	metadata filler,
 	lookupData func(string) string,
 ) error {
 
@@ -103,9 +100,11 @@ func (doit *toDo) prep(
 	flagPrintPathS(pma, prepS, "Prep:")
 
 	tempPile := MakePile(512, 512)
-
-	doit.do(doit.walkFS(pm_, prepS, tmplPile, tmplMatch))                    // prevS => tmplPile
-	doit.do(doit.fanOut(pm_, tmplPile, baseDict, baseMatch, tempPile))       // tmplPile => basePile & tempPile
+	metaPile := metadata.stuff.(*Pile)
+	baseDict := executes.stuff.(*lsm.LazyStringerMap)
+	baseMatch := executes.match
+	doit.do(doit.dirSWalker(pm_, prepS, template))                           // prevS => tmplPile
+	doit.do(doit.fanOut(pm_, template, baseDict, baseMatch, tempPile))       // tmplPile => basePile & tempPile
 	doit.do(doit.parseT(pm_, tempPile, metaPile, lookupData))                // tempPile => metaPile & doit.tmpl
 	for _, ok := metaPile.Iter(); ok && doit.ok(); _, ok = metaPile.Next() { // wait for metaPile
 		flagDot(pm_, dotData) // ...
@@ -113,7 +112,7 @@ func (doit *toDo) prep(
 	doit.wg.Wait() // wait for all
 	tempPile = nil // forget
 
-	doit.ifPrintPile(pmf, tmplPile, "File:")
+	doit.ifPrintPile(pmf, template.stuff.(*Pile), "File:")
 	doit.ifPrintPile(pmf, metaPile, "Meta:")
 	// TODO doit.ifPrintPile(pmf, basePile, "Base:")
 	doit.ifPrintTemplate(pmt, "Main:")
@@ -131,13 +130,10 @@ func (doit *toDo) prep(
 
 func (doit *toDo) exec(
 	execS dirS,
-	tmplPile *Pile,
-	tmplMatch pathIs,
-	baseDict *lsm.LazyStringerMap,
-	baseMatch pathIs,
-	metaPile *Pile,
-	execDict *lsm.LazyStringerMap,
-	execMatch pathIs,
+	template filler,
+	executes filler,
+	metadata filler,
+	writeout filler,
 	lookupData func(string) string,
 ) error {
 
