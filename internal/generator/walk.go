@@ -48,24 +48,6 @@ func matchFunc(pattern ...string) pathIs {
 	}
 }
 
-func pathPiler(match pathIs, pile *Pile) filepath.WalkFunc {
-	return func(path string, info os.FileInfo, err error) error {
-		if match(path) {
-			pile.Pile(path)
-		}
-		return nil
-	}
-}
-
-func namePiler(match pathIs, pile *Pile) filepath.WalkFunc {
-	return func(path string, info os.FileInfo, err error) error {
-		if match(path) {
-			pile.Pile(nameLessExt(path))
-		}
-		return nil
-	}
-}
-
 func ifFlagSkipDirWf(match pathIs) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		if match(path) {

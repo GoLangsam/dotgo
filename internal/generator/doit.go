@@ -34,10 +34,10 @@ func DoIt() error {
 	execMatch := matchFunc(patterns[len(patterns)-1])
 	fakeMatch := matchBool(true)
 
-	roottmpl := filler{fakeMatch, NewTemplate(aDot)} // TODO tmplMatch
+	roottmpl := filler{fakeMatch, NewTemplate(aDot)} // root template
 	_ = roottmpl
 	tmplfile := filler{tmplMatch, MakePile(512, 128)} // files (templates) to handle
-	metadata := filler{fakeMatch, MakePile(256, 64)}  // templates with non-empty meta: apply in reverse order!
+	metaFill := filler{fakeMatch, MakePile(256, 64)}  // templates with non-empty meta: apply in reverse order!
 	executes := filler{baseMatch, lsm.New()}          // templates to execute: basenames found
 	writeout := filler{execMatch, lsm.New()}          // folder(s) for execution
 
@@ -59,20 +59,51 @@ func DoIt() error {
 	prepS := pathS[:split]  // - prepare all but last
 	execS := pathS[split:]  // - execute only last
 
-	metaParser := maker{metadata.stuff, doit.metaParser(lookupData)}
-	_ = metaParser
+	if doit.ok() && len(prepS) > 0 {
 
-	if doit.ok() {
-		err := doit.prep(prepS, tmplfile, executes, metadata, lookupData) // Analyse
-		if err != nil && !doit.ifPrintErrors("Prepare Main:") {           // abort?
-			doit.can()
-			return err
+		analyse := flagOpen(pm_, "Prepare:")
+		flagPrintPathS(pma, prepS, "Prep:")
+
+		flagFOut := maker{filler{fakeMatch, nullCloser()}, func(string) {
+			flagDot(pm_, dotFOut) // ...
+		}}
+		flagTmpl := maker{filler{fakeMatch, nullCloser()}, func(string) {
+			flagDot(pm_, dotTmpl) // ...
+		}}
+		flagData := maker{filler{fakeMatch, nullCloser()}, func(string) {
+			flagDot(pm_, dotData) // ...
+		}}
+
+		tempPile := MakePile(512, 512)
+		baseDict := executes.stuff.(*lsm.LazyStringerMap)
+		baseMatch := executes.match
+		doit.do(doit.dirSWalker(pm_, prepS, tmplfile))                     // go prevS => tmplPile
+		doit.do(doit.fanOut(pm_, tmplfile, baseDict, baseMatch, tempPile)) // go tmplPile => basePile & tempPile
+		tp := tmplParser(doit, lookupData, metaFill.stuff.(*Pile))         //    tmplParser
+		tmplMake := maker{tempPile, tp}                                    // => doit.data
+		doit.do(doit.iter(tempPile, tmplMake, flagTmpl))                   // go tempPile => metaPile & doit.tmpl
+		doit.do(doit.iter(metaFill, flagData))                             // go drain meta
+		doit.wg.Wait()                                                     // wait for all
+		tempPile = nil                                                     // forget
+
+		doit.ifPrintPile(pmf, tmplfile.stuff.(*Pile), "File:")
+		doit.ifPrintPile(pmf, metaFill.stuff.(*Pile), "Meta:")
+		// TODO doit.ifPrintPile(pmf, basePile, "Base:")
+		doit.ifPrintTemplate(pmt, "Main:")
+		if pmd { // build a throw-away DataTree
+			mp := metaParser(doit, lookupData)  // metaParser
+			do := metaFill.make(mp)             // parse meta
+			doit.iter(do.stuff, flagFOut, do)() // metaPile => doit.data
+			doit.ifPrintDataTree(pmd, aDot)     // show
+			doit.data = NewData(aDot)           // forget
 		}
+
+		flagClose(pm_, analyse)
 	}
 
-	if doit.ok() && !nox {
+	if doit.ok() && !nox && !doit.ifPrintErrors("Prepare Main:") {
 		//	todo.Execute()
-		err := doit.exec(execS, tmplfile, executes, metadata, writeout, lookupData) // Execute
+		err := doit.exec(execS, tmplfile, executes, metaFill, writeout, lookupData) // Execute
 		if err != nil && !doit.ifPrintErrors("Prepare Exec:") {                     // abort?
 			doit.can()
 			return err
@@ -84,53 +115,9 @@ func DoIt() error {
 	return err
 }
 
-func (doit *toDo) prep(
-	prepS dirS,
-	template filler,
-	executes filler,
-	metadata filler,
-	lookupData func(string) string,
-) error {
-
-	if len(prepS) < 1 {
-		return nil // nothing to do
-	}
-
-	analyse := flagOpen(pm_, "Analyse:")
-	flagPrintPathS(pma, prepS, "Prep:")
-
-	tempPile := MakePile(512, 512)
-	metaPile := metadata.stuff.(*Pile)
-	baseDict := executes.stuff.(*lsm.LazyStringerMap)
-	baseMatch := executes.match
-	doit.do(doit.dirSWalker(pm_, prepS, template))                           // prevS => tmplPile
-	doit.do(doit.fanOut(pm_, template, baseDict, baseMatch, tempPile))       // tmplPile => basePile & tempPile
-	doit.do(doit.parseT(pm_, tempPile, metaPile, lookupData))                // tempPile => metaPile & doit.tmpl
-	for _, ok := metaPile.Iter(); ok && doit.ok(); _, ok = metaPile.Next() { // wait for metaPile
-		flagDot(pm_, dotData) // ...
-	}
-	doit.wg.Wait() // wait for all
-	tempPile = nil // forget
-
-	doit.ifPrintPile(pmf, template.stuff.(*Pile), "File:")
-	doit.ifPrintPile(pmf, metaPile, "Meta:")
-	// TODO doit.ifPrintPile(pmf, basePile, "Base:")
-	doit.ifPrintTemplate(pmt, "Main:")
-	if pmd { // build a throw-away DataTree
-		doit.do(doit.parseM(pm_, metaPile, lookupData)) // metaPile => doit.data
-		doit.wg.Wait()                                  // wait
-		doit.ifPrintDataTree(pmd, aDot)                 // show
-		doit.data = NewData(aDot)                       // forget
-	}
-
-	flagClose(pm_, analyse)
-
-	return doit.ctx.Err()
-}
-
 func (doit *toDo) exec(
 	execS dirS,
-	template filler,
+	tmplfile filler,
 	executes filler,
 	metadata filler,
 	writeout filler,

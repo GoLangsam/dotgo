@@ -26,3 +26,17 @@ type maker struct {
 func (m maker) Close() error {
 	return m.stuff.Close()
 }
+
+func (f filler) make(do nameDo) maker {
+	return maker{f.stuff, do}
+}
+
+type nullcloser struct{}
+
+func (n nullcloser) Close() error {
+	return nil
+}
+
+func nullCloser() nullcloser {
+	return nullcloser{}
+}

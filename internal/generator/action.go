@@ -5,6 +5,7 @@
 package gen
 
 import (
+	"os"
 	"path/filepath"
 
 	"github.com/golangsam/container/ccsafe/lsm"
@@ -13,14 +14,26 @@ import (
 func (t *toDo) dirSWalker(
 	dot bool,
 	inp dirS,
-	out filler,
+	out ...filler,
 ) func() {
 
 	return func() {
 
-		defer out.stuff.Close()
+		defer func() {
+			for i := range out {
+				out[i].stuff.Close()
+			}
+		}()
 
-		fh := pathPiler(out.match, out.stuff.(*Pile)) // => populate tmplPile
+		fh := func(path string, info os.FileInfo, err error) error {
+			for i := range out {
+				if out[i].match(path) {
+					out[i].stuff.(*Pile).Pile(path)
+				}
+			}
+			return nil
+		}
+
 		for i := 0; i < len(inp) && t.ok(); i++ {
 			flagDot(dot, dotWalk) // ...
 
@@ -30,21 +43,27 @@ func (t *toDo) dirSWalker(
 	}
 }
 
-func (t *toDo) pileWalker(
-	dot bool,
-	inp *Pile,
-	out ...maker,
-) func() {
+func (t *toDo) iter(inp Closer, out ...maker) func() {
+	switch i := inp.(type) {
+	case filler:
+		return t.iter(i.stuff, out...)
+	case maker:
+		return t.iter(i.stuff, out...)
+	case *Pile:
+		return t.iterPile(i, out...)
+	case *lsm.LazyStringerMap:
+		return t.iterDict(i, out...)
+	default:
+		panic("No walker for this type")
+	}
+}
+
+func (t *toDo) iterPile(inp *Pile, out ...maker) func() {
 
 	return func() {
 
-		defer func() {
-			for i := range out {
-				out[i].stuff.Close()
-			}
-		}()
+		defer closeMaker(out...)
 		for item, ok := inp.Iter(); ok && t.ok(); item, ok = inp.Next() {
-			flagDot(dot, dotFOut) // ...
 			for i := range out {
 				out[i].do(item)
 			}
@@ -52,30 +71,35 @@ func (t *toDo) pileWalker(
 	}
 }
 
-func (t *toDo) dictWalker(
-	dot bool,
-	inp *lsm.LazyStringerMap,
-	out ...maker,
-) func() {
+func (t *toDo) iterDict(inp *lsm.LazyStringerMap, out ...maker) func() {
 
 	return func() {
 
-		defer func() {
-			for i := range out {
-				out[i].stuff.Close()
-			}
-		}()
+		defer closeMaker(out...)
 		for _, item := range inp.S() {
 			if !t.ok() {
 				return // bail out
 			}
-			flagDot(dot, dotFOut) // ...
 			for i := range out {
 				out[i].do(item)
 			}
 		}
 	}
 }
+
+func closeFiller(out ...filler) {
+	for i := range out {
+		out[i].stuff.Close()
+	}
+}
+
+func closeMaker(out ...maker) {
+	for i := range out {
+		out[i].stuff.Close()
+	}
+}
+
+// ========================== old style ==========================
 
 func (t *toDo) fanOut(
 	dot bool,
@@ -96,39 +120,6 @@ func (t *toDo) fanOut(
 	}
 }
 
-func (t *toDo) parseT(
-	dot bool,
-	inp *Pile,
-	out *Pile,
-	get func(string) string,
-) func() {
-
-	return func() {
-
-		defer out.Close()
-
-		for item, ok := inp.Iter(); ok && t.ok(); item, ok = inp.Next() {
-			flagDot(dot, dotTmpl) // ...
-			t.itemParseT(item, out, get)
-		}
-	}
-}
-
-func (t *toDo) parseM(
-	dot bool,
-	inp *Pile,
-	get func(string) string,
-) func() {
-
-	return func() {
-
-		for item, ok := inp.Iter(); ok && t.ok(); item, ok = inp.Next() {
-			flagDot(dot, dotData) // ...
-			t.itemParseM(item, get)
-		}
-	}
-}
-
 func (t *toDo) itemFanOut(
 	item string,
 	out *lsm.LazyStringerMap,
@@ -141,45 +132,33 @@ func (t *toDo) itemFanOut(
 	}
 }
 
-func (t *toDo) itemParseT(
-	item string,
-	out *Pile,
+// ========================== pathDo ==========================
+
+func tmplParser(
+	t *toDo,
 	get func(string) string,
-) {
-	var err error
-	text := get(item)
-	name := nameLessExt(item)
+	out *Pile,
+) nameDo {
+	return func(item string) {
 
-	t.tmpl, err = t.tmpl.Make(name, text) // Parse the data
-	t.data.SeeError("CollectTmpl: Parse:", name, err)
+		var err error
+		text := get(item)
+		name := nameLessExt(item)
 
-	meta, err := Meta(text) // extract meta-data
-	t.data.SeeError("CollectMeta: Extract:", name, err)
+		t.tmpl, err = t.tmpl.Make(name, text) // Parse the data
+		t.data.SeeError("CollectTmpl: Parse:", name, err)
 
-	if meta != "" { // has meta?
-		out.Pile(item) // => populate metaPile
+		meta, err := Meta(text) // extract meta-data
+		t.data.SeeError("CollectMeta: Extract:", name, err)
+
+		if meta != "" { // has meta?
+			out.Pile(item) // => populate metaPile
+		}
 	}
 }
 
-func (t *toDo) itemParseM(
-	item string,
-	get func(string) string,
-) {
-	var err error
-	text := get(item)
-	name := nameLessExt(item) + ".meta"
-
-	meta, err := Meta(text) // extract meta-data
-	t.data.SeeError("CollectMeta: Extract:", name, err)
-
-	t.tmpl, err = t.tmpl.Make(name, meta) // Parse the meta-data
-	t.data.SeeError("CollectMeta: Parse:", name, err)
-
-	_, err = Apply(t.data, t.tmpl, name)
-	t.data.SeeError("CollectMeta: Apply:", name, err)
-}
-
-func (t *toDo) metaParser(
+func metaParser(
+	t *toDo,
 	get func(string) string,
 ) nameDo {
 	return func(item string) {
