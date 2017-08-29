@@ -20,7 +20,7 @@ func nameLessExt(path string) string {
 }
 
 // pathIs - given some path, returns a bool
-type pathIs func(path string) bool
+type itemIs func(path string) bool
 
 // pathDo - given some path, does sth and returns error
 type pathDo func(path string) error
@@ -29,14 +29,14 @@ type pathDo func(path string) error
 type nameDo func(name string)
 
 // matchBool - iff flag
-func matchBool(flag bool) pathIs {
+func matchBool(flag bool) itemIs {
 	return func(path string) bool {
 		return flag
 	}
 }
 
 // matchFunc - iff filename matches any pattern
-func matchFunc(pattern ...string) pathIs {
+func matchFunc(pattern ...string) itemIs {
 	return func(path string) (matched bool) {
 		for i := range pattern {
 			matched, _ = filepath.Match(pattern[i], filepath.Base(path)) // ignore errors
@@ -48,7 +48,7 @@ func matchFunc(pattern ...string) pathIs {
 	}
 }
 
-func ifFlagSkipDirWf(match pathIs) filepath.WalkFunc {
+func ifFlagSkipDirWf(match itemIs) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		if match(path) {
 			return nil

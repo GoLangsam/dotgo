@@ -51,17 +51,6 @@ func flagClose(flag bool, start time.Time) {
 	runtime.GC()
 }
 
-// ifPrintPile prints all items of the pile, iff flag is true
-func (t *toDo) ifPrintPile(flag bool, pile *Pile, prefix string) {
-	if flag && t.ok() {
-		fmt.Println(prefix+tab+cnt, len(<-pile.Done()), tab)
-		for item, ok := pile.Iter(); ok && t.ok(); item, ok = pile.Next() {
-			fmt.Println(tab + item + tab)
-		}
-		fmt.Println()
-	}
-}
-
 // flagPrintByteS prints the byteS (as string), iff flag is true
 func flagPrintByteS(flag bool, byteS []byte, header string) {
 	if flag {
@@ -96,6 +85,17 @@ func flagPrintPathS(flag bool, pathS dirS, header string) {
 		for i := range pathS {
 			flagPrintString(flag, tab+pathS[i].DirPath, dots(pathS[i].Recurse))
 			// fmt.Println(tab + pathS[i].DirPath + tab + dots(pathS[i].Recurse))
+		}
+		fmt.Println()
+	}
+}
+
+// ifPrintPile prints all items of the pile, iff flag is true
+func (t *toDo) ifPrintPile(flag bool, pile nextPile, prefix string) {
+	if flag && t.ok() {
+		fmt.Println(prefix+tab+cnt, len(<-pile.Done()), tab)
+		for item, ok := pile.Iter(); ok && t.ok(); item, ok = pile.Next() {
+			fmt.Println(tab + item + tab)
 		}
 		fmt.Println()
 	}

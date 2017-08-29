@@ -7,29 +7,20 @@ package gen
 import (
 	"os"
 	"path/filepath"
-
-	"github.com/golangsam/container/ccsafe/lsm"
 )
 
 func (t *toDo) dirSWalker(
 	dot bool,
 	inp dirS,
-	out ...filler,
+	out ...maker,
 ) func() {
 
 	return func() {
 
-		defer func() {
-			for i := range out {
-				out[i].stuff.Close()
-			}
-		}()
-
+		defer closeMaker(out...)
 		fh := func(path string, info os.FileInfo, err error) error {
 			for i := range out {
-				if out[i].match(path) {
-					out[i].stuff.(*Pile).Pile(path)
-				}
+				out[i].do(path)
 			}
 			return nil
 		}
@@ -43,76 +34,20 @@ func (t *toDo) dirSWalker(
 	}
 }
 
-func (t *toDo) iter(inp Closer, out ...maker) func() {
-	switch i := inp.(type) {
-	case filler:
-		return t.iter(i.stuff, out...)
-	case maker:
-		return t.iter(i.stuff, out...)
-	case *Pile:
-		return t.iterPile(i, out...)
-	case *lsm.LazyStringerMap:
-		return t.iterDict(i, out...)
-	default:
-		panic("No walker for this type")
-	}
-}
-
-func (t *toDo) iterPile(inp *Pile, out ...maker) func() {
-
-	return func() {
-
-		defer closeMaker(out...)
-		for item, ok := inp.Iter(); ok && t.ok(); item, ok = inp.Next() {
-			for i := range out {
-				out[i].do(item)
-			}
-		}
-	}
-}
-
-func (t *toDo) iterDict(inp *lsm.LazyStringerMap, out ...maker) func() {
-
-	return func() {
-
-		defer closeMaker(out...)
-		for _, item := range inp.S() {
-			if !t.ok() {
-				return // bail out
-			}
-			for i := range out {
-				out[i].do(item)
-			}
-		}
-	}
-}
-
-func closeFiller(out ...filler) {
-	for i := range out {
-		out[i].stuff.Close()
-	}
-}
-
-func closeMaker(out ...maker) {
-	for i := range out {
-		out[i].stuff.Close()
-	}
-}
-
 // ========================== old style ==========================
 
 func (t *toDo) fanOut(
 	dot bool,
-	inp filler,
-	out *lsm.LazyStringerMap,
-	iff pathIs,
-	dup *Pile,
+	inp maker,
+	out maker,
+	iff itemIs,
+	dup maker,
 ) func() {
 
 	return func() {
 
 		defer dup.Close()
-		pile := inp.stuff.(*Pile)
+		pile := inp.stuff.(nextPile)
 		for item, ok := pile.Iter(); ok && t.ok(); item, ok = pile.Next() {
 			flagDot(dot, dotFOut) // ...
 			t.itemFanOut(item, out, iff, dup)
@@ -122,13 +57,13 @@ func (t *toDo) fanOut(
 
 func (t *toDo) itemFanOut(
 	item string,
-	out *lsm.LazyStringerMap,
-	iff pathIs,
-	dup *Pile,
+	out maker,
+	iff itemIs,
+	dup maker,
 ) {
-	dup.Pile(item)
+	// TODO dup.Pile(item)
 	if iff(item) {
-		out.Assign(nameLessExt(item), nil)
+		// TODO out.Assign(nameLessExt(item), nil)
 	}
 }
 
@@ -137,7 +72,6 @@ func (t *toDo) itemFanOut(
 func tmplParser(
 	t *toDo,
 	get func(string) string,
-	out *Pile,
 ) nameDo {
 	return func(item string) {
 
@@ -147,13 +81,6 @@ func tmplParser(
 
 		t.tmpl, err = t.tmpl.Make(name, text) // Parse the data
 		t.data.SeeError("CollectTmpl: Parse:", name, err)
-
-		meta, err := Meta(text) // extract meta-data
-		t.data.SeeError("CollectMeta: Extract:", name, err)
-
-		if meta != "" { // has meta?
-			out.Pile(item) // => populate metaPile
-		}
 	}
 }
 

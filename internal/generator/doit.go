@@ -9,7 +9,6 @@ import (
 
 	"github.com/golangsam/container/ccsafe/dotpath"
 	"github.com/golangsam/container/ccsafe/fileinfocache"
-	"github.com/golangsam/container/ccsafe/lsm"
 )
 
 // dirS adopts the result of dotpath.DotPathS
@@ -28,29 +27,54 @@ func (d dirS) Close() error {
 //  - execution of all relevant templates
 // TODO dirS shall be absolute, if we intend to move os.Getwd during Exec
 func DoIt() error {
-	patterns := filepath.SplitList(tmplread)
-	tmplMatch := matchFunc(patterns...)
-	baseMatch := matchFunc(patterns[0])
-	execMatch := matchFunc(patterns[len(patterns)-1])
-	fakeMatch := matchBool(true)
-
-	roottmpl := filler{fakeMatch, NewTemplate(aDot)} // root template
-	_ = roottmpl
-	tmplfile := filler{tmplMatch, MakePile(512, 128)} // files (templates) to handle
-	metaFill := filler{fakeMatch, MakePile(256, 64)}  // templates with non-empty meta: apply in reverse order!
-	executes := filler{baseMatch, lsm.New()}          // templates to execute: basenames found
-	writeout := filler{execMatch, lsm.New()}          // folder(s) for execution
-
-	data := NewData(aDot)
-	tmpl := NewTemplate(aDot)
-	doit := doIt(data, tmpl)
-
 	fsCache := fic.New()
 
 	// lookupData retrieves the data related to file from cache
 	lookupData := func(path string) string {
 		return fsCache.LookupData(path)
 	}
+
+	patterns := filepath.SplitList(tmplread)
+	tmplMatch := matchFunc(patterns...)
+	baseMatch := matchFunc(patterns[0])
+	execMatch := matchFunc(patterns[len(patterns)-1])
+	//fakeMatch := matchBool(true)
+
+	// roottmpl := filler{fakeMatch, NewTemplate(aDot)} // root template
+	// _ = roottmpl
+	pathPile := NewNext(512, 128) // files (templates) to handle
+	metaPile := NewPrev(256, 64)  // templates with non-empty meta: apply in reverse order!
+	baseDict := NewDict()         // templates to execute: basenames found
+	execDict := NewDict()         // mathching file(s) identify folder(s) for execution
+
+	pathMake := maker{pathPile, func(item string) {
+		if tmplMatch(item) {
+			pathPile.Add(item)
+		}
+	}}
+
+	metaMake := maker{metaPile, func(item string) {
+		meta, err := Meta(lookupData(item))
+		if err == nil && meta != "" {
+			pathPile.Add(item)
+		}
+	}}
+
+	baseMake := maker{baseDict, func(item string) {
+		if baseMatch(item) {
+			baseDict.Add(nameLessExt(item))
+		}
+	}}
+
+	execMake := maker{execDict, func(item string) {
+		if execMatch(item) {
+			execDict.Add(nameLessExt(item))
+		}
+	}}
+
+	data := NewData(aDot)
+	tmpl := NewTemplate(aDot)
+	doit := doIt(data, tmpl)
 
 	pathS := dotpath.DotPathS(flagArgs()...)
 	flagPrintPathS(pma, pathS, "Args:")
@@ -64,38 +88,42 @@ func DoIt() error {
 		analyse := flagOpen(pm_, "Prepare:")
 		flagPrintPathS(pma, prepS, "Prep:")
 
-		flagFOut := maker{filler{fakeMatch, nullCloser()}, func(string) {
+		flagFOut := maker{null(), func(string) {
 			flagDot(pm_, dotFOut) // ...
 		}}
-		flagTmpl := maker{filler{fakeMatch, nullCloser()}, func(string) {
+		flagTmpl := maker{null(), func(string) {
 			flagDot(pm_, dotTmpl) // ...
 		}}
-		flagData := maker{filler{fakeMatch, nullCloser()}, func(string) {
+		flagData := maker{null(), func(string) {
 			flagDot(pm_, dotData) // ...
 		}}
 
-		tempPile := MakePile(512, 512)
-		baseDict := executes.stuff.(*lsm.LazyStringerMap)
-		baseMatch := executes.match
-		doit.do(doit.dirSWalker(pm_, prepS, tmplfile))                     // go prevS => tmplPile
-		doit.do(doit.fanOut(pm_, tmplfile, baseDict, baseMatch, tempPile)) // go tmplPile => basePile & tempPile
-		tp := tmplParser(doit, lookupData, metaFill.stuff.(*Pile))         //    tmplParser
-		tmplMake := maker{tempPile, tp}                                    // => doit.data
-		doit.do(doit.iter(tempPile, tmplMake, flagTmpl))                   // go tempPile => metaPile & doit.tmpl
-		doit.do(doit.iter(metaFill, flagData))                             // go drain meta
-		doit.wg.Wait()                                                     // wait for all
-		tempPile = nil                                                     // forget
+		tempPile := NewNext(512, 512)
+		tempMake := maker{tempPile, func(item string) {
+			tempPile.Add(item)
+		}}
 
-		doit.ifPrintPile(pmf, tmplfile.stuff.(*Pile), "File:")
-		doit.ifPrintPile(pmf, metaFill.stuff.(*Pile), "Meta:")
+		tp := tmplParser(doit, lookupData) //    tmplParser
+		tmplMake := maker{tempPile, tp}    // => doit.data
+
+		doit.do(doit.dirSWalker(pm_, prepS, pathMake))               // go prevS => tmplPile
+		doit.do(pathMake.Walker(doit, flagFOut, baseMake, tempMake)) // go tmplPile => basePile & tempPile
+		doit.do(tempMake.Walker(doit, flagTmpl, tmplMake, metaMake)) // go tempPile => metaPile & doit.tmpl
+		doit.do(metaMake.Walker(doit, flagData))                     // go drain meta
+		doit.wg.Wait()                                               // wait for all
+		tempPile = NewNext(0, 0)                                     // forget
+		tempMake = maker{tempPile, func(string) {}}                  // forget
+
+		doit.ifPrintPile(pmf, pathPile, "File:")
+		doit.ifPrintPile(pmf, metaPile, "Meta:")
 		// TODO doit.ifPrintPile(pmf, basePile, "Base:")
 		doit.ifPrintTemplate(pmt, "Main:")
 		if pmd { // build a throw-away DataTree
-			mp := metaParser(doit, lookupData)  // metaParser
-			do := metaFill.make(mp)             // parse meta
-			doit.iter(do.stuff, flagFOut, do)() // metaPile => doit.data
-			doit.ifPrintDataTree(pmd, aDot)     // show
-			doit.data = NewData(aDot)           // forget
+			mp := metaParser(doit, lookupData) // metaParser
+			do := maker{metaPile, mp}          // parse meta
+			do.Walker(doit, flagFOut, do)()    // metaPile => doit.data
+			doit.ifPrintDataTree(pmd, aDot)    // show
+			doit.data = NewData(aDot)          // forget
 		}
 
 		flagClose(pm_, analyse)
@@ -103,7 +131,7 @@ func DoIt() error {
 
 	if doit.ok() && !nox && !doit.ifPrintErrors("Prepare Main:") {
 		//	todo.Execute()
-		err := doit.exec(execS, tmplfile, executes, metaFill, writeout, lookupData) // Execute
+		err := doit.exec(execS, pathMake, baseMake, metaMake, execMake, lookupData) // Execute
 		if err != nil && !doit.ifPrintErrors("Prepare Exec:") {                     // abort?
 			doit.can()
 			return err
@@ -117,10 +145,10 @@ func DoIt() error {
 
 func (doit *toDo) exec(
 	execS dirS,
-	tmplfile filler,
-	executes filler,
-	metadata filler,
-	writeout filler,
+	tmplfile maker,
+	executes maker,
+	metadata maker,
+	writeout maker,
 	lookupData func(string) string,
 ) error {
 
@@ -132,7 +160,7 @@ func (doit *toDo) exec(
 		_ = execS[i].DirPath
 		_ = execS[i].Recurse
 
-		foldPile := MakePile(16, 4) // folders / subdirectories found (not used here)
+		foldPile := NewNext(16, 4) // folders / subdirectories found (not used here)
 		foldMatch := matchBool(true)
 		var downS dirS
 		_, _, _ = foldPile, foldMatch, downS

@@ -9,13 +9,13 @@ package gen
 
 // Note: originally inspired by parts of "cmd/doc/dirs.go"
 
-// Pile is a hybrid container for
+// StringPile is a hybrid container for
 // a lazily and concurrently populated growing-only slice
 // of items (of type `string`)
 // which may be traversed in parallel to it's growth.
 //
 // Usage for a pile `p`:
-//  p := MakePile(128, 32)
+//  p := MakeStringPile(128, 32)
 //
 // Have it grow concurrently using multiple:
 //  var item string = something
@@ -26,7 +26,7 @@ package gen
 // traverse `p` in parallel right away:
 //  for item, ok := p.Iter(); ok; item, ok = p.Next() { ... do sth with item ... }
 // Here p.Iter() starts a new transversal with the first item (if any), and
-// p.Next() keeps traverses the Pile.
+// p.Next() keeps traverses the StringPile.
 //
 // or traverse blocking / awaiting close first:
 //  for item := range <-p.Done() { ... do sth with item ... }
@@ -39,28 +39,28 @@ package gen
 // Thus: You may call `Pile` concurrently to Your traversal, but use of
 // either `Done` or `Iter` and `Next` *must* be confined to a single go routine (thread).
 //
-type Pile struct {
+type StringPile struct {
 	pile   chan string // channel to receive further items
 	list   []string    // list of known items
 	offset int         // index for Next()
 }
 
-// MakePile returns a (pointer to a) fresh pile
+// MakeStringPile returns a (pointer to a) fresh pile
 // of items (of type `string`)
 // with size as initial capacity
 // and
 // with buff as initial leeway, allowing as many Pile's to execute non-blocking before respective Done or Next's.
-func MakePile(size, buff int) *Pile {
-	pile := new(Pile)
+func MakeStringPile(size, buff int) *StringPile {
+	pile := new(StringPile)
 	pile.list = make([]string, 0, size)
 	pile.pile = make(chan string, buff)
 	return pile
 }
 
-// Pile appends an `string` item to the Pile.
+// Pile appends an `string` item to the StringPile.
 //
 // Note: Pile will block iff buff is exceeded and no Done() or Next()'s are used.
-func (d *Pile) Pile(item string) {
+func (d *StringPile) Pile(item string) {
 	d.pile <- item
 }
 
@@ -69,12 +69,12 @@ func (d *Pile) Pile(item string) {
 // Close intentionally implements io.Closer
 //
 // Note: After Close(),
-// any Close(...) will return the error from close(chan), or panic
+// any Close(...) will panic
 // and
 // any Pile(...) will panic
 // and
 // any Done() or Next() will return immediately: no eventual blocking, that is.
-func (d *Pile) Close() (err error) {
+func (d *StringPile) Close() (err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			var ok bool
@@ -91,7 +91,7 @@ func (d *Pile) Close() (err error) {
 // and returns the first `Next()`, iff any.
 // Usage for a pile `p`:
 //  for item, ok := p.Iter(); ok; item, ok = p.Next() { ... do sth with item ... }
-func (d *Pile) Iter() (item string, ok bool) {
+func (d *StringPile) Iter() (item string, ok bool) {
 	d.offset = 0
 	return d.Next()
 }
@@ -101,7 +101,7 @@ func (d *Pile) Iter() (item string, ok bool) {
 //
 // Note: Iff the pile is not closed yet,
 // Next may block, awaiting some Pile().
-func (d *Pile) Next() (item string, ok bool) {
+func (d *StringPile) Next() (item string, ok bool) {
 	if d.offset < len(d.list) {
 		ok = true
 		item = d.list[d.offset]
@@ -111,9 +111,9 @@ func (d *Pile) Next() (item string, ok bool) {
 		d.offset++
 	}
 	return item, ok
-	}
+}
 
-// Done returns a channel which emits the result (as slice of ) once the pile is closed.
+// Done returns a channel which emits the result (as slice of String) once the pile is closed.
 //
 // Users of Done() *must not* iterate (via Iter() Next()...) before the done-channel is closed!
 //
@@ -128,9 +128,9 @@ func (d *Pile) Next() (item string, ok bool) {
 // or use the result when available
 //  r, p := <-p.Done(), nil
 // while discaring the pile itself.
-func (d *Pile) Done() (done <-chan []string) {
+func (d *StringPile) Done() (done <-chan []string) {
 	cha := make(chan []string)
-	go func(cha chan<- []string, d *Pile) {
+	go func(cha chan<- []string, d *StringPile) {
 		defer close(cha)
 		d.offset = 0
 		if len(d.list) > d.offset {
