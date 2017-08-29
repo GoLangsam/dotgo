@@ -8,6 +8,12 @@ package gen
 type Item interface {
 	Add(item string)                     // add item to content
 	S() []string                         // content as stringS
-	Walker(t *toDo, out ...maker) func() // provide traversal - interruptable
+	Walker(t *toDo, out ...Actor) func() // provide traversal - interruptable
 	Close() error                        // mimic io.Closer - definded locally in order to avoid explicit dependency
 }
+
+// itemIs - given some path, returns a bool
+type itemIs func(path string) bool
+
+// itemDo - given some name, does sth
+type itemDo func(name string)

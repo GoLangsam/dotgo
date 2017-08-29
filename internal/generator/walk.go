@@ -19,15 +19,6 @@ func nameLessExt(path string) string {
 	return strings.TrimSuffix(name, filepath.Ext(name))
 }
 
-// pathIs - given some path, returns a bool
-type itemIs func(path string) bool
-
-// pathDo - given some path, does sth and returns error
-type pathDo func(path string) error
-
-// nameDo - given some name, does sth
-type nameDo func(name string)
-
 // matchBool - iff flag
 func matchBool(flag bool) itemIs {
 	return func(path string) bool {

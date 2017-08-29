@@ -11,16 +11,6 @@ import (
 	"github.com/golangsam/container/ccsafe/fileinfocache"
 )
 
-// dirS adopts the result of dotpath.DotPathS
-type dirS []struct {
-	DirPath string
-	Recurse bool
-}
-
-func (d dirS) Close() error {
-	return nil
-}
-
 // DoIt performs it all:
 //  - file system analysis (where to look)
 //  - collection of metadata from templates
@@ -47,26 +37,26 @@ func DoIt() error {
 	baseDict := NewDict()         // templates to execute: basenames found
 	execDict := NewDict()         // mathching file(s) identify folder(s) for execution
 
-	pathMake := maker{pathPile, func(item string) {
+	pathMake := Actor{pathPile, func(item string) {
 		if tmplMatch(item) {
 			pathPile.Add(item)
 		}
 	}}
 
-	metaMake := maker{metaPile, func(item string) {
+	metaMake := Actor{metaPile, func(item string) {
 		meta, err := Meta(lookupData(item))
 		if err == nil && meta != "" {
 			pathPile.Add(item)
 		}
 	}}
 
-	baseMake := maker{baseDict, func(item string) {
+	baseMake := Actor{baseDict, func(item string) {
 		if baseMatch(item) {
 			baseDict.Add(nameLessExt(item))
 		}
 	}}
 
-	execMake := maker{execDict, func(item string) {
+	execMake := Actor{execDict, func(item string) {
 		if execMatch(item) {
 			execDict.Add(nameLessExt(item))
 		}
@@ -79,40 +69,43 @@ func DoIt() error {
 	pathS := dotpath.DotPathS(flagArgs()...)
 	flagPrintPathS(pma, pathS, "Args:")
 
-	split := len(pathS) - 1 // at last:
-	prepS := pathS[:split]  // - prepare all but last
-	execS := pathS[split:]  // - execute only last
+	split := len(pathS) - 1        // at last:
+	prepS := asDirS(pathS[:split]) // - prepare all but last
+	execS := asDirS(pathS[split:]) // - execute only last
 
 	if doit.ok() && len(prepS) > 0 {
 
 		analyse := flagOpen(pm_, "Prepare:")
 		flagPrintPathS(pma, prepS, "Prep:")
 
-		flagFOut := maker{null(), func(string) {
+		flagWalk := Actor{NewNull(), func(string) {
+			flagDot(pm_, dotWalk) // ...
+		}}
+		flagFOut := Actor{NewNull(), func(string) {
 			flagDot(pm_, dotFOut) // ...
 		}}
-		flagTmpl := maker{null(), func(string) {
+		flagTmpl := Actor{NewNull(), func(string) {
 			flagDot(pm_, dotTmpl) // ...
 		}}
-		flagData := maker{null(), func(string) {
+		flagData := Actor{NewNull(), func(string) {
 			flagDot(pm_, dotData) // ...
 		}}
 
 		tempPile := NewNext(512, 512)
-		tempMake := maker{tempPile, func(item string) {
+		tempMake := Actor{tempPile, func(item string) {
 			tempPile.Add(item)
 		}}
 
 		tp := tmplParser(doit, lookupData) //    tmplParser
-		tmplMake := maker{tempPile, tp}    // => doit.data
+		tmplMake := Actor{tempPile, tp}    // => doit.data
 
-		doit.do(doit.dirSWalker(pm_, prepS, pathMake))               // go prevS => tmplPile
+		doit.do(prepS.Walker(doit, flagWalk, pathMake))              // go prevS => tmplPile
 		doit.do(pathMake.Walker(doit, flagFOut, baseMake, tempMake)) // go tmplPile => basePile & tempPile
 		doit.do(tempMake.Walker(doit, flagTmpl, tmplMake, metaMake)) // go tempPile => metaPile & doit.tmpl
 		doit.do(metaMake.Walker(doit, flagData))                     // go drain meta
 		doit.wg.Wait()                                               // wait for all
 		tempPile = NewNext(0, 0)                                     // forget
-		tempMake = maker{tempPile, func(string) {}}                  // forget
+		tempMake = Actor{tempPile, func(string) {}}                  // forget
 
 		doit.ifPrintPile(pmf, pathPile, "File:")
 		doit.ifPrintPile(pmf, metaPile, "Meta:")
@@ -120,7 +113,7 @@ func DoIt() error {
 		doit.ifPrintTemplate(pmt, "Main:")
 		if pmd { // build a throw-away DataTree
 			mp := metaParser(doit, lookupData) // metaParser
-			do := maker{metaPile, mp}          // parse meta
+			do := Actor{metaPile, mp}          // parse meta
 			do.Walker(doit, flagFOut, do)()    // metaPile => doit.data
 			doit.ifPrintDataTree(pmd, aDot)    // show
 			doit.data = NewData(aDot)          // forget
@@ -145,10 +138,10 @@ func DoIt() error {
 
 func (doit *toDo) exec(
 	execS dirS,
-	tmplfile maker,
-	executes maker,
-	metadata maker,
-	writeout maker,
+	tmplfile Actor,
+	executes Actor,
+	metadata Actor,
+	writeout Actor,
 	lookupData func(string) string,
 ) error {
 

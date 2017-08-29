@@ -22,7 +22,7 @@ func (p prevPile) Add(item string) {
 	p.Pile(item)
 }
 
-func (p prevPile) Adder() nameDo {
+func (p prevPile) Adder() itemDo {
 	return func(item string) {
 		p.Pile(item)
 	}
@@ -32,15 +32,13 @@ func (p prevPile) S() []string {
 	return <-p.Done()
 }
 
-func (p prevPile) Walker(t *toDo, out ...maker) func() {
+func (p prevPile) Walker(t *toDo, out ...Actor) func() {
 
 	return func() {
 
-		defer closeMaker(out...)
+		defer ActorsClose(out...)
 		for item, ok := p.Iter(); ok && t.ok(); item, ok = p.Next() { // TODO must reverse!
-			for i := range out {
-				out[i].do(item)
-			}
+			ActorsDo(item, out...)
 		}
 	}
 }

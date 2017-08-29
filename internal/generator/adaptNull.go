@@ -4,24 +4,24 @@
 
 package gen
 
-type nullItem struct{}
+type Null struct{}
 
-func null() nullItem {
-	return nullItem{}
+func NewNull() Null {
+	return Null{}
 }
 
-func (n nullItem) S() []string {
+func (n Null) S() []string {
 	return []string{}
 }
 
-func (n nullItem) Close() error {
+func (n Null) Close() error {
 	return nil
 }
 
-func (n nullItem) Walker(t *toDo, out ...maker) func() {
+func (n Null) Walker(t *toDo, out ...Actor) func() {
 	return func() { return }
 }
 
-func (n nullItem) Add(item string) {
+func (n Null) Add(item string) {
 	// nop
 }

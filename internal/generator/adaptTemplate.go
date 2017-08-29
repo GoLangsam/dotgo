@@ -31,12 +31,12 @@ func (template Template) Make(name, body string) (new Template, err error) {
 	return new, err
 }
 
-// Close - pretend to be a Closer (<=> an io.Closer)
-func (template Template) Close() error {
-	return nil
-}
-
 // Meta returns the meta-text extraced from text
 func Meta(text string) (string, error) {
 	return t.Meta(text)
+}
+
+// Close - pretend to be a Closer (<=> an io.Closer)
+func (template Template) Close() error {
+	return nil
 }

@@ -23,18 +23,16 @@ func (d Dict) Close() error {
 	return nil
 }
 
-func (d Dict) Walker(t *toDo, out ...maker) func() {
+func (d Dict) Walker(t *toDo, out ...Actor) func() {
 
 	return func() {
 
-		defer closeMaker(out...)
+		defer ActorsClose(out...)
 		for _, item := range d.S() {
 			if !t.ok() {
 				return // bail out
 			}
-			for i := range out {
-				out[i].do(item)
-			}
+			ActorsDo(item, out...)
 		}
 	}
 }
@@ -43,7 +41,7 @@ func (d Dict) Add(item string) {
 	d.Assign(item, nil)
 }
 
-func (d Dict) Adder() nameDo {
+func (d Dict) Adder() itemDo {
 	return func(item string) {
 		d.Assign(item, nil)
 	}
