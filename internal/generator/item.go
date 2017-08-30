@@ -10,6 +10,7 @@ type Item interface {
 	S() []string                         // content as stringS
 	Walker(t *toDo, out ...Actor) func() // provide traversal - interruptable
 	Close() error                        // mimic io.Closer - definded locally in order to avoid explicit dependency
+	flagPrint(flag bool, header string)
 }
 
 // itemIs - given some path, returns a bool

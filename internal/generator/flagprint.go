@@ -78,16 +78,64 @@ func flagPrintString(flag bool, prefix string, suffix string) {
 	}
 }
 
+// flagPrint delegates to it
+func (m Actor) flagPrint(flag bool, header string) {
+	m.it.flagPrint(flag, header)
+}
+
+// flagPrint prints the dictionary, iff flag is true
+func (d Dict) flagPrint(flag bool, header string) {
+	if flag {
+		fmt.Println(header+tab+cnt, d.Len(), tab, tab)
+
+		if true {
+			for _, s := range d.S() {
+				flagPrintString(flag, "", s)
+			}
+			fmt.Println()
+
+		}
+	}
+}
+
+// flagPrint prints the path names, iff flag is true
+func (d DirS) flagPrint(flag bool, header string) {
+	if flag {
+		fmt.Println(header+tab+cnt, len(d), tab, tab)
+
+		if true {
+			for i := range d {
+				flagPrintString(flag, tab+d[i].DirPath, dots(d[i].Recurse))
+				// fmt.Println(tab + pathS[i].DirPath + tab + dots(pathS[i].Recurse))
+			}
+			fmt.Println()
+		}
+	}
+}
+
+// flagPrint prints nothing but header, iff flag is true
+func (n Null) flagPrint(flag bool, header string) {
+	if flag {
+		fmt.Println(header + tab)
+		if true {
+			fmt.Println()
+		}
+	}
+}
+
 // flagPrint prints the pile, iff flag is true
 func (p nextPile) flagPrint(flag bool, header string) {
 	if flag {
 		itemS := <-p.Done()
 		count := len(itemS)
 		fmt.Println(header+tab+cnt, count, tab)
-		for i := range itemS {
-			fmt.Println(tab + itemS[i] + tab)
+
+		if true {
+			for i := range itemS {
+				fmt.Println(tab + itemS[i] + tab)
+			}
+			fmt.Println()
 		}
-		fmt.Println()
 	}
 }
 
@@ -97,23 +145,13 @@ func (p prevPile) flagPrint(flag bool, header string) {
 		itemS := <-p.Done()
 		count := len(itemS)
 		fmt.Println(header+tab+cnt, count, tab)
-		for i := count - 1; i >= 0; i-- {
-			fmt.Println(tab + itemS[i] + tab)
-		}
-		fmt.Println()
-	}
-}
 
-// flagPrint prints the path names, iff flag is true
-func (d DirS) flagPrint(flag bool, header string) {
-	if flag {
-		fmt.Println(header+tab+cnt, len(d), tab, tab)
-
-		for i := range d {
-			flagPrintString(flag, tab+d[i].DirPath, dots(d[i].Recurse))
-			// fmt.Println(tab + pathS[i].DirPath + tab + dots(pathS[i].Recurse))
+		if true {
+			for i := count - 1; i >= 0; i-- {
+				fmt.Println(tab + itemS[i] + tab)
+			}
+			fmt.Println()
 		}
-		fmt.Println()
 	}
 }
 
@@ -138,7 +176,9 @@ func (data Dot) flagPrint(flag bool, header string) {
 func (t *toDo) ifPrintTemplate(flag bool, header string) {
 	if flag && t.ok() {
 		flagPrintTemplate(true, t.tmpl, header)
-		fmt.Println()
+		if true {
+			fmt.Println()
+		}
 	}
 }
 
@@ -146,7 +186,9 @@ func (t *toDo) ifPrintTemplate(flag bool, header string) {
 func (t *toDo) ifPrintDataTree(flag bool, header string) {
 	if flag && t.ok() {
 		flagPrintDataTree(true, t.data, header)
-		fmt.Println()
+		if true {
+			fmt.Println()
+		}
 	}
 }
 
