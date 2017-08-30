@@ -12,11 +12,22 @@ import (
 )
 
 // DoIt performs it all:
+//  - establish the participators
 //  - file system analysis (where to look)
 //  - collection of metadata from templates
 //  - execution of all relevant templates
 // TODO dirS shall be absolute, if we intend to move os.Getwd during Exec
 func DoIt() error {
+
+	// Beg of Prolog - we have something to declare
+
+	pathS := AsDirS(dotpath.DotPathS(flagArgs()...))
+	pathS.flagPrint(ap, "Args:")
+
+	split := len(pathS) - 1           // at last:
+	prepDirS := AsDirS(pathS[:split]) // - prepare all but last
+	execDirS := AsDirS(pathS[split:]) // - execute only last
+
 	fsCache := fic.New()
 
 	// lookupData retrieves the data related to file from cache
@@ -25,28 +36,36 @@ func DoIt() error {
 	}
 
 	patterns := filepath.SplitList(tmplread)
-	tmplMatch := matchFunc(patterns...)
+	fileMatch := matchFunc(patterns...)
 	baseMatch := matchFunc(patterns[0])
 	execMatch := matchFunc(patterns[len(patterns)-1])
 	//fakeMatch := matchBool(true)
 
-	// roottmpl := filler{fakeMatch, NewTemplate(aDot)} // root template
-	// _ = roottmpl
-	pathPile := NewNext(512, 128) // files (templates) to handle
-	metaPile := NewPrev(256, 64)  // templates with non-empty meta: apply in reverse order!
-	baseDict := NewDict()         // templates to execute: basenames found
-	execDict := NewDict()         // mathching file(s) identify folder(s) for execution
+	// Containers - mostly Item's
+	filePile := NewNext(512, 128) // files (templates) to handle
+	//metaPile := NewPrev(256, 64)     // templates with non-empty meta: apply in reverse order!
+	metaPile := NewPrev(256, 0)      // templates with non-empty meta: apply in reverse order!
+	baseDict := NewDict()            // templates to execute: basenames found
+	execDict := NewDict()            // mathching file(s) identify folder(s) for execution
+	rootData := NewData(aDot)        // data - a Dot
+	rootTmpl := NewTemplate(aDot)    // text/template
+	doit := doIt(rootData, rootTmpl) // carries context, and data & tmpl
 
-	pathMake := Actor{pathPile, func(item string) {
-		if tmplMatch(item) {
-			pathPile.Add(item)
+	// Actors - how to populate each Container
+	fileMake := Actor{filePile, func(item string) {
+		if fileMatch(item) {
+			filePile.Add(item)
 		}
 	}}
 
 	metaMake := Actor{metaPile, func(item string) {
+		println("\nCheck Meta " + item)
 		meta, err := Meta(lookupData(item))
 		if err == nil && meta != "" {
-			pathPile.Add(item)
+			metaPile.Add(item)
+			println("\nsFound Meta " + item)
+		} else if err != nil {
+			panic(err)
 		}
 	}}
 
@@ -58,74 +77,63 @@ func DoIt() error {
 
 	execMake := Actor{execDict, func(item string) {
 		if execMatch(item) {
-			execDict.Add(nameLessExt(item))
+			execDict.Add(nameLessExt(item)) // TODO this is wrong: we need the directory! nameLessExt get's appended to base
 		}
 	}}
 
-	data := NewData(aDot)
-	tmpl := NewTemplate(aDot)
-	doit := doIt(data, tmpl)
+	// some Null Actors - for flagDot dotter
+	flagWalk := Actor{NewNull(), func(item string) {
+		flagDot(a_, dotWalk) // ...
+	}}
+	flagFOut := Actor{NewNull(), func(item string) {
+		flagDot(a_, dotFOut) // ...
+		println(item)
+	}}
+	flagTmpl := Actor{NewNull(), func(item string) {
+		flagDot(a_, dotTmpl) // ...
+	}}
+	flagData := Actor{NewNull(), func(item string) {
+		flagDot(a_, dotData) // ...
+	}}
 
-	pathS := dotpath.DotPathS(flagArgs()...)
-	flagPrintPathS(pma, pathS, "Args:")
+	// End of Prolog
 
-	split := len(pathS) - 1        // at last:
-	prepS := asDirS(pathS[:split]) // - prepare all but last
-	execS := asDirS(pathS[split:]) // - execute only last
+	if doit.ok() && len(prepDirS) > 0 { // Beg of prep Analysis
+		analyse := flagOpen(a_, "Prepare:")
+		prepDirS.flagPrint(ap, "Prep:")
 
-	if doit.ok() && len(prepS) > 0 {
-
-		analyse := flagOpen(pm_, "Prepare:")
-		flagPrintPathS(pma, prepS, "Prep:")
-
-		flagWalk := Actor{NewNull(), func(string) {
-			flagDot(pm_, dotWalk) // ...
-		}}
-		flagFOut := Actor{NewNull(), func(string) {
-			flagDot(pm_, dotFOut) // ...
-		}}
-		flagTmpl := Actor{NewNull(), func(string) {
-			flagDot(pm_, dotTmpl) // ...
-		}}
-		flagData := Actor{NewNull(), func(string) {
-			flagDot(pm_, dotData) // ...
-		}}
-
-		tempPile := NewNext(512, 512)
+		// a temp Pile - fan out file names
+		tempPile := NewNext(128, 32)
 		tempMake := Actor{tempPile, func(item string) {
 			tempPile.Add(item)
 		}}
 
-		tp := tmplParser(doit, lookupData) //    tmplParser
-		tmplMake := Actor{tempPile, tp}    // => doit.data
+		tmplParse := Actor{tempPile, tmplParser(doit, lookupData)} // => doit.tmpl
+		metaParse := Actor{metaPile, metaParser(doit, lookupData)} // => doit.tmpl
 
-		doit.do(prepS.Walker(doit, flagWalk, pathMake))              // go prevS => tmplPile
-		doit.do(pathMake.Walker(doit, flagFOut, baseMake, tempMake)) // go tmplPile => basePile & tempPile
-		doit.do(tempMake.Walker(doit, flagTmpl, tmplMake, metaMake)) // go tempPile => metaPile & doit.tmpl
-		doit.do(metaMake.Walker(doit, flagData))                     // go drain meta
+		doit.do(prepDirS.Walker(doit, flagWalk, tempMake, fileMake)) // go prepS => temp & file path
+		doit.do(tempMake.Walker(doit, flagTmpl, tmplParse))          // go temp => doit.tmpl
+		doit.do(fileMake.Walker(doit, flagFOut, metaMake, baseMake)) // go path => meta & base
+		doit.do(metaMake.Walker(doit, flagData, metaParse))          // go meta => drain
 		doit.wg.Wait()                                               // wait for all
-		tempPile = NewNext(0, 0)                                     // forget
-		tempMake = Actor{tempPile, func(string) {}}                  // forget
 
-		doit.ifPrintPile(pmf, pathPile, "File:")
-		doit.ifPrintPile(pmf, metaPile, "Meta:")
-		// TODO doit.ifPrintPile(pmf, basePile, "Base:")
-		doit.ifPrintTemplate(pmt, "Main:")
-		if pmd { // build a throw-away DataTree
-			mp := metaParser(doit, lookupData) // metaParser
-			do := Actor{metaPile, mp}          // parse meta
-			do.Walker(doit, flagFOut, do)()    // metaPile => doit.data
-			doit.ifPrintDataTree(pmd, aDot)    // show
-			doit.data = NewData(aDot)          // forget
-		}
+		tempPile = NewNext(0, 0)                    // forget
+		tempMake = Actor{tempPile, func(string) {}} // forget
 
-		flagClose(pm_, analyse)
-	}
+		doit.ifPrintTemplate(at, "Main:")
+		doit.ifPrintDataTree(ad, aDot)
+		filePile.flagPrint(af, "File:")
+		metaPile.flagPrint(af, "Meta:")
+		// baseDict.flagPrint(af, "Base:")
+
+		doit.data = NewData(aDot) // forget
+		flagClose(a_, analyse)
+	} // End of prep Analysis
 
 	if doit.ok() && !nox && !doit.ifPrintErrors("Prepare Main:") {
 		//	todo.Execute()
-		err := doit.exec(execS, pathMake, baseMake, metaMake, execMake, lookupData) // Execute
-		if err != nil && !doit.ifPrintErrors("Prepare Exec:") {                     // abort?
+		err := doit.exec(execDirS, fileMake, baseMake, metaMake, execMake, lookupData) // Execute
+		if err != nil && !doit.ifPrintErrors("Prepare Exec:") {                        // abort?
 			doit.can()
 			return err
 		}
@@ -137,7 +145,7 @@ func DoIt() error {
 }
 
 func (doit *toDo) exec(
-	execS dirS,
+	execS DirS,
 	tmplfile Actor,
 	executes Actor,
 	metadata Actor,
@@ -145,7 +153,7 @@ func (doit *toDo) exec(
 	lookupData func(string) string,
 ) error {
 
-	flagPrintPathS(pxa, execS, "Exec:")
+	execS.flagPrint(ea, "Exec:")
 
 	// we'll recurse!
 
@@ -155,7 +163,7 @@ func (doit *toDo) exec(
 
 		foldPile := NewNext(16, 4) // folders / subdirectories found (not used here)
 		foldMatch := matchBool(true)
-		var downS dirS
+		var downS DirS
 		_, _, _ = foldPile, foldMatch, downS
 		// we need to know:
 		// new subdirs => downS = append(subS, struct{DirPath:?, Recurse: dirS[i].Recurse}

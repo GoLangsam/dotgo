@@ -9,6 +9,10 @@ type Actor struct {
 	do itemDo // what to do to it
 }
 
+func (m Actor) Add(item string) {
+	m.it.Add(item)
+}
+
 func (m Actor) S() []string {
 	return m.it.S()
 }
@@ -19,10 +23,6 @@ func (m Actor) Close() error {
 
 func (m Actor) Walker(t *toDo, out ...Actor) func() {
 	return m.it.Walker(t, out...)
-}
-
-func (m Actor) Add(item string) {
-	m.it.Add(item)
 }
 
 func ActorsClose(out ...Actor) {

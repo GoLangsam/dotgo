@@ -26,6 +26,8 @@ func metaParser(
 	return func(item string) {
 
 		var err error
+		println("MetaParse: " + item)
+
 		text := get(item)
 		name := nameLessExt(item) + ".meta"
 

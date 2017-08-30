@@ -18,6 +18,10 @@ func NewDict() Dict {
 	return Dict{lsm.New()}
 }
 
+func (d Dict) Add(item string) {
+	d.Assign(item, nil)
+}
+
 // Close - pretend to be a Closer (<=> an io.Closer)
 func (d Dict) Close() error {
 	return nil
@@ -35,10 +39,6 @@ func (d Dict) Walker(t *toDo, out ...Actor) func() {
 			ActorsDo(item, out...)
 		}
 	}
-}
-
-func (d Dict) Add(item string) {
-	d.Assign(item, nil)
 }
 
 func (d Dict) Adder() itemDo {

@@ -36,6 +36,10 @@ func Meta(text string) (string, error) {
 	return t.Meta(text)
 }
 
+func (template Template) S() []string {
+	return t.Names(template)
+}
+
 // Close - pretend to be a Closer (<=> an io.Closer)
 func (template Template) Close() error {
 	return nil

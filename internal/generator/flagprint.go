@@ -25,6 +25,15 @@ const (
 	rec = "... recurse"
 )
 
+func dots(flag bool) string {
+	switch {
+	case flag:
+		return rec
+	default:
+		return ""
+	}
+}
+
 // flagOpen opens a phase and prints a prefix, iff flag is true
 // Note: returned time.Now() shall be passed to corresponding flagClose(flag, time,Time)
 func flagOpen(flag bool, prefix string) time.Time {
@@ -69,55 +78,79 @@ func flagPrintString(flag bool, prefix string, suffix string) {
 	}
 }
 
-// flagPrintPathS prints the path names, iff flag is true
-func flagPrintPathS(flag bool, pathS dirS, header string) {
+// flagPrint prints the pile, iff flag is true
+func (p nextPile) flagPrint(flag bool, header string) {
 	if flag {
-		fmt.Println(header+tab+cnt, len(pathS), tab, tab)
-
-		dots := func(flag bool) string {
-			switch {
-			case flag:
-				return rec
-			default:
-				return ""
-			}
+		itemS := <-p.Done()
+		count := len(itemS)
+		fmt.Println(header+tab+cnt, count, tab)
+		for i := range itemS {
+			fmt.Println(tab + itemS[i] + tab)
 		}
-		for i := range pathS {
-			flagPrintString(flag, tab+pathS[i].DirPath, dots(pathS[i].Recurse))
+		fmt.Println()
+	}
+}
+
+// flagPrint prints the pile, iff flag is true
+func (p prevPile) flagPrint(flag bool, header string) {
+	if flag {
+		itemS := <-p.Done()
+		count := len(itemS)
+		fmt.Println(header+tab+cnt, count, tab)
+		for i := count - 1; i >= 0; i-- {
+			fmt.Println(tab + itemS[i] + tab)
+		}
+		fmt.Println()
+	}
+}
+
+// flagPrint prints the path names, iff flag is true
+func (d DirS) flagPrint(flag bool, header string) {
+	if flag {
+		fmt.Println(header+tab+cnt, len(d), tab, tab)
+
+		for i := range d {
+			flagPrintString(flag, tab+d[i].DirPath, dots(d[i].Recurse))
 			// fmt.Println(tab + pathS[i].DirPath + tab + dots(pathS[i].Recurse))
 		}
 		fmt.Println()
 	}
 }
 
-// ifPrintPile prints all items of the pile, iff flag is true
-func (t *toDo) ifPrintPile(flag bool, pile nextPile, prefix string) {
-	if flag && t.ok() {
-		fmt.Println(prefix+tab+cnt, len(<-pile.Done()), tab)
-		for item, ok := pile.Iter(); ok && t.ok(); item, ok = pile.Next() {
-			fmt.Println(tab + item + tab)
-		}
+/*
+// flagPrint prints the template, iff flag is true
+func (tmpl Template) flagPrint(flag bool, header string) {
+	if flag {
+		flagPrintTemplate(true, tmpl, header)
 		fmt.Println()
 	}
 }
 
+// flagPrint  prints the data tree, iff flag is true
+func (data Dot) flagPrint(flag bool, header string) {
+	if flag {
+		flagPrintDataTree(true, data, header)
+		fmt.Println()
+	}
+}
+*/
 // ifPrintTemplate prints the template, iff flag is true
-func (t *toDo) ifPrintTemplate(flag bool, prefix string) {
+func (t *toDo) ifPrintTemplate(flag bool, header string) {
 	if flag && t.ok() {
-		flagPrintTemplate(true, t.tmpl, prefix)
+		flagPrintTemplate(true, t.tmpl, header)
 		fmt.Println()
 	}
 }
 
 // ifPrintDataTree prints the data tree, iff flag is true
-func (t *toDo) ifPrintDataTree(flag bool, prefix string) {
+func (t *toDo) ifPrintDataTree(flag bool, header string) {
 	if flag && t.ok() {
-		flagPrintDataTree(true, t.data, prefix)
+		flagPrintDataTree(true, t.data, header)
 		fmt.Println()
 	}
 }
 
 // ifPrintErrors prints the error(s), iff any
-func (t *toDo) ifPrintErrors(prefix string) bool {
-	return flagPrintErrors(t.data, prefix)
+func (t *toDo) ifPrintErrors(header string) bool {
+	return flagPrintErrors(t.data, header)
 }

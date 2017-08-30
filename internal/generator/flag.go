@@ -9,36 +9,38 @@ import (
 )
 
 var (
-	pm_, pmd, pmt, pmf, pmn, pma bool   // print main
-	px_, pxa, pxd, pxt, pxl      bool   // print exec
-	pw_, pwd, pwt, pwf, pwr      bool   // print write
-	exe, exr, exf, nox           bool   // write
-	tmplread                     string // TODO change default (& exf) acc to new 'type'-switch: md txt wiki ...
+	a_, ad, at, af, an, ap  bool   // print analysis
+	e_, ea, ed, et, el      bool   // print exec
+	w_, wd, wf, wr          bool   // print write
+	exe, ugo, exf, nox, nos bool   // write
+	seq                     bool   // sequential execution
+	tmplread                string // TODO change default (& exf) acc to new 'type'-switch: md txt wiki ...
 )
 
 func init() {
-	flag.BoolVar(&pm_, "a", false, "print all analysis info")
-	flag.BoolVar(&pma, "ap", false, "print analysis path(s)")
-	flag.BoolVar(&pmf, "af", false, "print analysis files")
-	flag.BoolVar(&pmn, "an", false, "print analysis names")
-	flag.BoolVar(&pmd, "ad", false, "print analysis datatree")
-	flag.BoolVar(&pmt, "at", false, "print analysis template names"+"\n\t")
+	flag.BoolVar(&a_, "a", false, "print all analysis info")
+	flag.BoolVar(&ap, "ap", false, "print analysis path(s)")
+	flag.BoolVar(&af, "af", false, "print analysis files")
+	flag.BoolVar(&an, "an", false, "print analysis names")
+	flag.BoolVar(&ad, "ad", false, "print analysis datatree")
+	flag.BoolVar(&at, "at", false, "print analysis template names"+"\n\t")
 
-	flag.BoolVar(&px_, "e", false, "print all execution info")
-	flag.BoolVar(&pxa, "ea", false, "print execution path")
-	flag.BoolVar(&pxl, "el", false, "print execution line")
-	flag.BoolVar(&pxd, "ed", false, "print execution datatree")
-	flag.BoolVar(&pxt, "et", false, "print execution template names"+"\n\t")
+	flag.BoolVar(&e_, "e", false, "print all execution info")
+	flag.BoolVar(&ea, "ea", false, "print execution path")
+	flag.BoolVar(&el, "el", false, "print execution line")
+	flag.BoolVar(&ed, "ed", false, "print execution datatree")
+	flag.BoolVar(&et, "et", false, "print execution template names"+"\n\t")
 
-	flag.BoolVar(&pw_, "w", false, "print all writing info")
-	flag.BoolVar(&pwd, "wd", false, "print writing directories")
-	flag.BoolVar(&pwr, "wr", false, "print raw unformatted text"+"\n\t")
-	flag.BoolVar(&pwf, "wf", false, "print formatted text")
+	flag.BoolVar(&w_, "w", false, "print all writing info")
+	flag.BoolVar(&wd, "wd", false, "print writing directories")
+	flag.BoolVar(&wr, "wr", false, "print raw unformatted text"+"\n\t")
+	flag.BoolVar(&wf, "wf", false, "print formatted text")
 
-	flag.BoolVar(&exr, "ugo", false, "execute: write raw text (as *.ugo)")
-	flag.BoolVar(&exe, "x", false, "execute: write resulting text")
+	flag.BoolVar(&seq, "seq", false, "sequential execution")
+	flag.BoolVar(&ugo, "ugo", false, "execute: safe raw text (as *.ugo)")
+	flag.BoolVar(&exe, "x", false, "execute: safe resulting text")
 	flag.BoolVar(&exf, "fmt", true, "apply go/format to raw text") // TODO fmt => nof & negate!
-	flag.BoolVar(&pwt, "now", false, "print resulting text only - do not write"+"\n\t")
+	flag.BoolVar(&nos, "nos", false, "print resulting text only - do not safe"+"\n\t")
 	flag.BoolVar(&nox, "nox", false, "skip execute, terminate after main analysis")
 
 	flag.StringVar(&tmplread, "patterns", "*.go.tmpl;*.tmpl;dot.go.tmpl",
@@ -60,28 +62,28 @@ func init() {
 
 func flagParse() {
 	flag.Parse()
-	if pm_ {
-		pma, pmf, pmn, pmd, pmt = true, true, true, true, true
-		pm_ = false
-	} else if !(pma || pmf || pmn || pmd || pmt) {
-		pm_ = true
+	if a_ {
+		ap, af, an, ad, at = true, true, true, true, true
+		a_ = false
+	} else if !(ap || af || an || ad || at) {
+		a_ = true
 	}
 
-	if px_ {
-		pxa, pxd, pxl, pxt = true, true, true, true
-		px_ = false
-	} else if !(pxa || pxd || pxl || pxt) {
-		px_ = true
+	if e_ {
+		ea, ed, el, et = true, true, true, true
+		e_ = false
+	} else if !(ea || ed || el || et) {
+		e_ = true
 	}
 
-	if pw_ {
-		pwd, pwf, pwr = true, true, true
-		pw_ = false
-	} else if !(pwd || pwf || pwr) {
-		pw_ = true
+	if w_ {
+		wd, wf, wr = true, true, true
+		w_ = false
+	} else if !(wd || wf || wr) {
+		w_ = true
 	}
 
-	if pwt {
+	if nos {
 		exe = false
 	}
 }

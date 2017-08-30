@@ -9,17 +9,27 @@ import (
 	"path/filepath"
 )
 
-// dirS adopts the result of dotpath.DotPathS
-type dirS []struct {
+// DirS adopts the result of dotpath.DotPathS
+//
+// Hint: use AsDirS for type conversion
+type DirS []struct {
 	DirPath string
 	Recurse bool
 }
 
-func (d dirS) Close() error {
+func (d DirS) S() []string {
+	s := []string{}
+	for i := range d {
+		s = append(s, d[i].DirPath+tab+dots(d[i].Recurse)+tab)
+	}
+	return s
+}
+
+func (d DirS) Close() error {
 	return nil
 }
 
-func (d dirS) Walker(t *toDo, out ...Actor) func() {
+func (d DirS) Walker(t *toDo, out ...Actor) func() {
 
 	return func() {
 
@@ -36,7 +46,7 @@ func (d dirS) Walker(t *toDo, out ...Actor) func() {
 	}
 }
 
-// asDirS - a helper for type conversion
-func asDirS(i dirS) dirS {
+// AsDirS - a helper for type conversion
+func AsDirS(i DirS) DirS {
 	return i
 }
