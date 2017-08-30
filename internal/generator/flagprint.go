@@ -79,16 +79,16 @@ func flagPrintString(flag bool, prefix string, suffix string) {
 }
 
 // flagPrint delegates to it
-func (m Actor) flagPrint(flag bool, header string) {
-	m.it.flagPrint(flag, header)
+func (m Actor) flagPrint(flag, verbose bool, header string) {
+	m.it.flagPrint(flag, verbose, header)
 }
 
 // flagPrint prints the dictionary, iff flag is true
-func (d Dict) flagPrint(flag bool, header string) {
+func (d Dict) flagPrint(flag, verbose bool, header string) {
 	if flag {
 		fmt.Println(header+tab+cnt, d.Len(), tab, tab)
 
-		if true {
+		if verbose {
 			for _, s := range d.S() {
 				flagPrintString(flag, "", s)
 			}
@@ -99,11 +99,11 @@ func (d Dict) flagPrint(flag bool, header string) {
 }
 
 // flagPrint prints the path names, iff flag is true
-func (d DirS) flagPrint(flag bool, header string) {
+func (d DirS) flagPrint(flag, verbose bool, header string) {
 	if flag {
 		fmt.Println(header+tab+cnt, len(d), tab, tab)
 
-		if true {
+		if verbose {
 			for i := range d {
 				flagPrintString(flag, tab+d[i].DirPath, dots(d[i].Recurse))
 				// fmt.Println(tab + pathS[i].DirPath + tab + dots(pathS[i].Recurse))
@@ -114,23 +114,23 @@ func (d DirS) flagPrint(flag bool, header string) {
 }
 
 // flagPrint prints nothing but header, iff flag is true
-func (n Null) flagPrint(flag bool, header string) {
+func (n Null) flagPrint(flag, verbose bool, header string) {
 	if flag {
 		fmt.Println(header + tab)
-		if true {
+		if verbose {
 			fmt.Println()
 		}
 	}
 }
 
 // flagPrint prints the pile, iff flag is true
-func (p nextPile) flagPrint(flag bool, header string) {
+func (p nextPile) flagPrint(flag, verbose bool, header string) {
 	if flag {
 		itemS := <-p.Done()
 		count := len(itemS)
 		fmt.Println(header+tab+cnt, count, tab)
 
-		if true {
+		if verbose {
 			for i := range itemS {
 				fmt.Println(tab + itemS[i] + tab)
 			}
@@ -140,13 +140,13 @@ func (p nextPile) flagPrint(flag bool, header string) {
 }
 
 // flagPrint prints the pile, iff flag is true
-func (p prevPile) flagPrint(flag bool, header string) {
+func (p prevPile) flagPrint(flag, verbose bool, header string) {
 	if flag {
 		itemS := <-p.Done()
 		count := len(itemS)
 		fmt.Println(header+tab+cnt, count, tab)
 
-		if true {
+		if verbose {
 			for i := count - 1; i >= 0; i-- {
 				fmt.Println(tab + itemS[i] + tab)
 			}

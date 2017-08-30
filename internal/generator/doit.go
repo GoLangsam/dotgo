@@ -22,7 +22,7 @@ func DoIt() error {
 	// Beg of Prolog - we have something to declare
 
 	pathS := AsDirS(dotpath.DotPathS(flagArgs()...))
-	pathS.flagPrint(ap, "Args:")
+	pathS.flagPrint(ap, apv, "Args:")
 
 	split := len(pathS) - 1           // at last:
 	prepDirS := AsDirS(pathS[:split]) // - prepare all but last
@@ -100,7 +100,7 @@ func DoIt() error {
 
 	if doit.ok() && len(prepDirS) > 0 { // Beg of prep Analysis
 		analyse := flagOpen(a_, "Prepare:")
-		prepDirS.flagPrint(ap, "Prep:")
+		prepDirS.flagPrint(ap, ap, "Prep:")
 
 		// a temp Pile - fan out file names
 		tempPile := NewNext(128, 32)
@@ -122,9 +122,9 @@ func DoIt() error {
 
 		doit.ifPrintTemplate(at, "Main:")
 		doit.ifPrintDataTree(ad, aDot)
-		filePile.flagPrint(af, "File:")
-		metaPile.flagPrint(af, "Meta:")
-		// baseDict.flagPrint(af, "Base:")
+		filePile.flagPrint(af, afv, "File:")
+		metaPile.flagPrint(af, afv, "Meta:")
+		baseDict.flagPrint(af, afv, "Base:")
 
 		doit.data = NewData(aDot) // forget
 		flagClose(a_, analyse)
@@ -153,7 +153,7 @@ func (doit *toDo) exec(
 	lookupData func(string) string,
 ) error {
 
-	execS.flagPrint(ea, "Exec:")
+	execS.flagPrint(ea, eav, "Exec:")
 
 	// we'll recurse!
 
