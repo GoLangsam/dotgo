@@ -44,14 +44,8 @@ func (t *toDo) ok() bool {
 func (t *toDo) do(do func()) {
 	t.wg.Add(1)
 
-	f := func(t *toDo, do func()) {
+	go func(t *toDo, do func()) {
 		defer t.wg.Done()
 		do()
-	}
-
-	if seq {
-		f(t, do)
-	} else {
-		go f(t, do)
-	}
+	}(t, do)
 }

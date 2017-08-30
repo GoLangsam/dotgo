@@ -15,13 +15,16 @@ var (
 	eav, edv, etv, elv      bool   // ...verbose
 	w_, wd, wf, wr          bool   // print write
 	wdv, wfv, wrv           bool   // ...verbose
-	exe, ugo, exf, nox, nos bool   // write
-	seq                     bool   // sequential execution
+	exe, ugo, nof, nox, nos bool   // write
 	tmplread                string // TODO change default (& exf) acc to new 'type'-switch: md txt wiki ...
 )
 
 func init() {
-	flag.BoolVar(&a_, "a", false, "print all analysis info")
+	const new = "\n"
+	const lin = "----------"
+	const sep = new + lin + lin + lin + lin + lin + lin + lin + lin + lin + lin + new
+
+	flag.BoolVar(&a_, "a", false, "print all analysis info:")
 	flag.BoolVar(&ap, "ap", false, "print analysis path(s)")
 	flag.BoolVar(&af, "af", false, "print analysis files")
 	flag.BoolVar(&an, "an", false, "print analysis names")
@@ -32,9 +35,9 @@ func init() {
 	flag.BoolVar(&afv, "afv", false, "...verbose")
 	flag.BoolVar(&anv, "anv", false, "...verbose")
 	flag.BoolVar(&adv, "adv", false, "...verbose")
-	flag.BoolVar(&atv, "atv", false, "...verbose"+"\n\t")
+	flag.BoolVar(&atv, "atv", false, "...verbose"+sep)
 
-	flag.BoolVar(&e_, "e", false, "print all execution info")
+	flag.BoolVar(&e_, "e", false, "print all execution info:")
 	flag.BoolVar(&ea, "ea", false, "print execution path")
 	flag.BoolVar(&el, "el", false, "print execution line")
 	flag.BoolVar(&ed, "ed", false, "print execution datatree")
@@ -43,25 +46,25 @@ func init() {
 	flag.BoolVar(&eav, "eav", false, "...verbose")
 	flag.BoolVar(&elv, "elv", false, "...verbose")
 	flag.BoolVar(&edv, "edv", false, "...verbose")
-	flag.BoolVar(&etv, "etv", false, "...verbose"+"\n\t")
+	flag.BoolVar(&etv, "etv", false, "...verbose"+sep)
 
-	flag.BoolVar(&w_, "w", false, "print all writing info")
-	flag.BoolVar(&wd, "wd", false, "print writing directories")
+	flag.BoolVar(&w_, "w", false, "print all writing info:")
+	flag.BoolVar(&wd, "wd", false, "print directories")
 	flag.BoolVar(&wf, "wf", false, "print formatted text")
 	flag.BoolVar(&wr, "wr", false, "print raw unformatted text")
 
 	flag.BoolVar(&wdv, "wdv", false, "...verbose")
 	flag.BoolVar(&wfv, "wfv", false, "...verbose")
-	flag.BoolVar(&wrv, "wrv", false, "...verbose"+"\n\t")
+	flag.BoolVar(&wrv, "wrv", false, "...verbose"+sep)
 
-	flag.BoolVar(&seq, "seq", false, "sequential execution")
-	flag.BoolVar(&ugo, "ugo", false, "execute: safe raw text (as *.ugo)")
+	flag.BoolVar(&nof, "nof", true, "no formatting - do not apply go/format to raw text")
+	flag.BoolVar(&nos, "nos", false, "no safe - print resulting text only")
+	flag.BoolVar(&nox, "nox", false, "no execute - terminate after main analysis"+sep)
+
 	flag.BoolVar(&exe, "x", false, "execute: safe resulting text")
-	flag.BoolVar(&exf, "fmt", true, "apply go/format to raw text") // TODO fmt => nof & negate!
-	flag.BoolVar(&nos, "nos", false, "print resulting text only - do not safe"+"\n\t")
-	flag.BoolVar(&nox, "nox", false, "skip execute, terminate after main analysis")
+	flag.BoolVar(&ugo, "xgo", false, "execute: safe raw text (as *.ugo)"+sep)
 
-	flag.StringVar(&tmplread, "patterns", "*.go.tmpl;*.tmpl;dot.go.tmpl",
+	flag.StringVar(&tmplread, "ext", "*.go.tmpl;*.tmpl;dot.go.tmpl",
 		"pattern list to match template file names"+
 			"\tNote:"+
 			"\n\tA template gets executed iff first pattern matches it's file!"+
