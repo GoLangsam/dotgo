@@ -14,27 +14,19 @@ import (
 
 type toDo struct {
 	data *dot.Dot
-	tmpl Template
 	ctx  context.Context
 	can  context.CancelFunc
 	wg   sync.WaitGroup
 }
 
-func doIt(data *dot.Dot, tmpl Template) *toDo {
+func doIt(data *dot.Dot) *toDo {
 	ctx, can := cancel.WithCancel()
 	wg := new(sync.WaitGroup)
-	return &toDo{data, tmpl, ctx, can, *wg}
+	return &toDo{data, ctx, can, *wg}
 }
 
-func (t *toDo) doIt(data *dot.Dot, tmpl Template) (todo *toDo, ok bool) {
-	select {
-	case <-t.ctx.Done():
-		ok = false
-	default:
-		ok = true
-	}
-	wg := new(sync.WaitGroup)
-	return &toDo{data, tmpl, t.ctx, t.can, *wg}, ok
+func (t *toDo) doIt(data *dot.Dot) *toDo {
+	return &toDo{data, t.ctx, t.can, t.wg}
 }
 
 func (t *toDo) ok() bool {

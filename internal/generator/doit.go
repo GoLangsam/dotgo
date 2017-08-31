@@ -39,61 +39,30 @@ func DoIt() error {
 	isFile := matchFunc(suffix...)
 	isBase := matchFunc(suffix[0])
 	isExec := matchFunc(suffix[len(suffix)-1])
-	//isTrue := matchBool(true)
+	isTrue := matchBool(true)
 
-	filePile := NewNext(512, 128) // files (templates) to handle
-	//metaPile := NewPrev(256, 64)     // templates with non-empty meta: apply in reverse order!
-	metaPile := NewPrev(256, 0)      // templates with non-empty meta: apply in reverse order!
-	baseDict := NewDict()            // templates to execute: basenames found
-	execDict := NewDict()            // mathching file(s) identify folder(s) for execution
-	rootData := NewData(aDot)        // data - a Dot
-	rootTmpl := NewTemplate(aDot)    // text/template
-	doit := doIt(rootData, rootTmpl) // carries context, and data & tmpl
-
-	// Actors - how to populate each Container
-	fileMake := Actor{filePile, func(item string) {
-		if isFile(item) {
-			filePile.Pile(item)
-		}
-	}}
-
-	metaMake := Actor{metaPile, func(item string) {
-		println("\nCheck Meta " + item)
+	hasMeta := func(item string) bool {
 		meta, err := Meta(lookupData(item))
-		if err == nil && meta != "" {
-			metaPile.Pile(item)
-			println("\nFound Meta " + item)
-		} else if err != nil {
+		if err != nil {
 			panic(err)
 		}
-	}}
+		return meta != ""
+	}
 
-	baseMake := Actor{baseDict, func(item string) {
-		if isBase(item) {
-			baseDict.Assign(nameLessExt(item), nil)
-		}
-	}}
+	// Actors - Some containers, and how to populate each
+	fileMake := NewNext(512, 128).Action(isFile)  // files (templates) to handle
+	metaMake := NewPrev(256, 064).Action(hasMeta) // templates with non-empty meta: apply in reverse order!
+	baseMake := NewDict().Action(isBase)          // templates to execute: basenames found
+	execMake := NewDict().Action(isExec)          // TODO this is wrong: we need the directory! nameLessExt get's appended to base            // mathching file(s) identify folder(s) for execution
+	rootTmpl := NewTemplate(aDot)                 // text/template
+	rootData := NewData(aDot)                     // data - a Dot
+	doit := doIt(rootData)                        // carries context, and data
 
-	execMake := Actor{execDict, func(item string) {
-		if isExec(item) {
-			execDict.Assign(nameLessExt(item), nil) // TODO this is wrong: we need the directory! nameLessExt get's appended to base
-		}
-	}}
-
-	// some Null Actors - for flagDot dotter
-	flagWalk := Actor{NewNull(), func(item string) {
-		flagDot(a_, dotWalk) // ...
-	}}
-	flagFOut := Actor{NewNull(), func(item string) {
-		flagDot(a_, dotFOut) // ...
-		println(item)
-	}}
-	flagTmpl := Actor{NewNull(), func(item string) {
-		flagDot(a_, dotTmpl) // ...
-	}}
-	flagData := Actor{NewNull(), func(item string) {
-		flagDot(a_, dotData) // ...
-	}}
+	// some Null Actors - for flagDot dotter  // ...
+	flagWalk := Actor{NewNull(), func(item string) { flagDot(a_, dotWalk) }}
+	flagFOut := Actor{NewNull(), func(item string) { flagDot(a_, dotFOut) }}
+	flagTmpl := Actor{NewNull(), func(item string) { flagDot(a_, dotTmpl) }}
+	flagData := Actor{NewNull(), func(item string) { flagDot(a_, dotData) }}
 
 	// End of Prolog
 
@@ -101,29 +70,24 @@ func DoIt() error {
 		analyse := flagOpen(a_, "Prepare:")
 		prepDirS.flagPrint(ap, ap, "Prep:")
 
-		// a temp Pile - fan out file names
-		tempPile := NewNext(128, 32)
-		tempMake := Actor{tempPile, func(item string) {
-			tempPile.Pile(item)
-		}}
+		// a temp - for fan-out file names
+		tempMake := NewNext(128, 32).Action(isTrue)
 
-		tmplParse := Actor{tempPile, tmplParser(doit, lookupData)} // => doit.tmpl
-		metaParse := Actor{metaPile, metaParser(doit, lookupData)} // => doit.tmpl
+		tmplParse := Actor{tempMake.it, tmplParser(doit, rootTmpl, lookupData)}          // => doit.tmpl
+		metaParse := Actor{metaMake.it, metaParser(doit, NewTemplate(aDot), lookupData)} // => doit.tmpl
 
 		doit.do(prepDirS.Walker(doit, flagWalk, tempMake, fileMake)) // go prepS => temp & file path
 		doit.do(tempMake.Walker(doit, flagTmpl, tmplParse))          // go temp => doit.tmpl
 		doit.do(fileMake.Walker(doit, flagFOut, metaMake, baseMake)) // go path => meta & base
 		doit.do(metaMake.Walker(doit, flagData, metaParse))          // go meta => drain
 		doit.wg.Wait()                                               // wait for all
+		tempMake = NewNext(0, 0).Action(isTrue)                      // forget temp
 
-		tempPile = NewNext(0, 0)                    // forget
-		tempMake = Actor{tempPile, func(string) {}} // forget
-
-		doit.tmpl.flagPrint(at, atv, "Main:")
+		rootTmpl.flagPrint(at, atv, "Main:")
 		doit.ifPrintDataTree(ad, aDot)
-		filePile.flagPrint(af, afv, "File:")
-		metaPile.flagPrint(am, amv, "Meta:")
-		baseDict.flagPrint(an, anv, "Base:")
+		fileMake.flagPrint(af, afv, "File:")
+		metaMake.flagPrint(am, amv, "Meta:")
+		baseMake.flagPrint(an, anv, "Base:")
 
 		doit.data = NewData(aDot) // forget
 		flagClose(a_, analyse)
