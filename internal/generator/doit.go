@@ -43,17 +43,7 @@ func DoIt() error {
 		}
 		return meta != ""
 	}
-
-	// Actors - Some containers, and how to populate each
-	fileMake := NewNext(512, 128).Action(isFile)                   // files (templates) to handle
-	metaMake := NewPrev(256, 064).Action(hasMeta)                  // templates with non-empty meta: apply in reverse order!
-	baseMake := NewDict().Action(isBase)                           // templates to execute: basenames found
-	execMake := NewDict().Action(isExec)                           // TODO this is wrong: we need the directory! nameLessExt get's appended to base            // mathching file(s) identify folder(s) for execution
-	rootData := NewData(aDot)                                      // data - a Dot
-	metaData := NewData(aDot)                                      // data for metaParser
-	rootTmpl := NewTemplate(aDot).tmplParser(rootData, lookupData) // text/template
-	metaTmpl := NewTemplate(aDot).metaParser(metaData, lookupData) // text/template from meta
-	doit := doIt(rootData)                                         // carries context, and data
+	_ = isTrue
 
 	// doer - just do something
 	doer := func(do func()) *Actor { a := Actor{NewNull(), func(string) { do() }}; return &a }
@@ -64,6 +54,18 @@ func DoIt() error {
 	flagTmpl := doer(func() { flagDot(a_, dotTmpl) })
 	flagData := doer(func() { flagDot(a_, dotData) })
 
+	show := func() Actor { return Actor{NewNull(), func(item string) { println("Debug:" + tab + item) }} }
+	_ = show
+
+	// Actors - Some containers, and how to populate each
+	filePile := NewNext(512, 128).Action(isFile)                   // files (templates) to handle
+	metaPile := NewPrev(256, 064).Action(hasMeta)                  // templates with non-empty meta: apply in reverse order!
+	baseDict := NewDict().Action(isBase)                           // templates to execute: basenames found
+	execDict := NewDict().Action(isExec)                           // TODO this is wrong: we need the directory! nameLessExt get's appended to base            // mathching file(s) identify folder(s) for execution
+	rootData := NewData(aDot)                                      // data - a Dot
+	rootTmpl := NewTemplate(aDot).tmplParser(rootData, lookupData) // text/template
+	doit := doIt(rootData)                                         // carries context, and data
+
 	// End of Prolog
 
 	if doit.ctx.Err() == nil && len(prepDirS) > 0 { // Beg of prep Analysis
@@ -71,22 +73,28 @@ func DoIt() error {
 		prepDirS.flagPrint(ap, ap, "Prep:")
 
 		// a temp - for fan-out file names
-		tempMake := NewNext(128, 32).Action(isTrue)
+		tempPile := NewNext(512, 128).Action(isFile)
 
 		quit := func() bool { return doit.ctx.Err() != nil }         // quit, iff not doit.ok
-		doit.do(prepDirS.Walker(quit, flagWalk, tempMake, fileMake)) // go prepS => temp & file path
-		doit.do(tempMake.Walker(quit, flagFOut, metaMake, baseMake)) // go temp => meta & base
-		doit.do(fileMake.Walker(quit, flagTmpl, rootTmpl))           // go file => rootTmpl
-		doit.do(metaMake.Walker(quit, flagData, metaTmpl))           // go meta => metaTmpl & metaData
+		doit.do(prepDirS.Walker(quit, flagWalk, tempPile, filePile)) // go prepS => temp & file path
+		doit.do(tempPile.Walker(quit, flagFOut, execDict, baseDict)) // go temp => meta & base
+		doit.do(filePile.Walker(quit, flagTmpl, rootTmpl, metaPile)) // go file => rootTmpl
+		doit.do(metaPile.Walker(quit, flagData))                     // go meta => drain
 		doit.wg.Wait()                                               // wait for all
-		tempMake = NewNext(0, 0).Action(isTrue)                      // forget temp
+
+		tmpl, err := rootTmpl.it.(Template).Clone()                 // Clone rootTmpl
+		rootData.SeeError("Clone", "Root", err)                     // err? ignore for now
+		metaTmpl := Template{tmpl}.metaParser(rootData, lookupData) // text/template from meta
+		doit.do(metaPile.Walker(quit, flagData, metaTmpl))          // go meta => metaTmpl & metaData
+		doit.wg.Wait()                                              // wait for all
+		tempPile = NewNext(0, 0).Action(isTrue)                     // TODO forget temp
 
 		rootTmpl.flagPrint(at, atv, "Main:")
 		metaTmpl.flagPrint(at, atv, "Meta:")
 		doit.ifPrintDataTree(ad, aDot)
-		fileMake.flagPrint(af, afv, "File:")
-		metaMake.flagPrint(am, amv, "Meta:")
-		baseMake.flagPrint(an, anv, "Base:")
+		filePile.flagPrint(af, afv, "File:")
+		metaPile.flagPrint(am, amv, "Meta:")
+		baseDict.flagPrint(an, anv, "Base:")
 
 		doit.data = NewData(aDot) // forget
 		flagClose(a_, analyse)
@@ -94,7 +102,7 @@ func DoIt() error {
 
 	if doit.ctx.Err() == nil && !nox && !doit.ifPrintErrors("Prepare Main:") {
 		//	todo.Execute()
-		err := doit.exec(execDirS, fileMake, baseMake, metaMake, execMake, lookupData) // Execute
+		err := doit.exec(execDirS, filePile, baseDict, metaPile, execDict, lookupData) // Execute
 		if err != nil && !doit.ifPrintErrors("Prepare Exec:") {                        // abort?
 			doit.can()
 			return err
