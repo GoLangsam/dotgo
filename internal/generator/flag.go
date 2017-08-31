@@ -9,14 +9,14 @@ import (
 )
 
 var (
-	a_, ad, at, af, an, am, ap   bool   // print analysis
-	adv, atv, afv, anv, amv, apv bool   // ...verbose
-	e_, ea, ed, et, el           bool   // print exec
-	eav, edv, etv, elv           bool   // ...verbose
-	w_, wd, wf, wr               bool   // print write
-	wdv, wfv, wrv                bool   // ...verbose
-	exe, ugo, nof, nox, nos      bool   // write
-	tmplread                     string // TODO change default (& exf) acc to new 'type'-switch: md txt wiki ...
+	a_, ad, ar, at, af, an, am, ap    bool   // print analysis
+	adv, arv, atv, afv, anv, amv, apv bool   // ...verbose
+	e_, ea, ed, et, el                bool   // print exec
+	eav, edv, etv, elv                bool   // ...verbose
+	w_, wd, wf, wr                    bool   // print write
+	wdv, wfv, wrv                     bool   // ...verbose
+	exe, ugo, nof, nox, nos           bool   // write
+	tmplread                          string // TODO change default (& exf) acc to new 'type'-switch: md txt wiki ...
 )
 
 func init() {
@@ -30,13 +30,15 @@ func init() {
 	flag.BoolVar(&an, "an", false, "print analysis names")
 	flag.BoolVar(&am, "am", false, "print analysis meta files")
 	flag.BoolVar(&ad, "ad", false, "print analysis datatree")
-	flag.BoolVar(&at, "at", false, "print analysis template names")
+	flag.BoolVar(&ar, "ar", false, "print analysis root template names")
+	flag.BoolVar(&at, "at", false, "print analysis meta template names")
 
 	flag.BoolVar(&apv, "apv", false, "...verbose")
 	flag.BoolVar(&afv, "afv", false, "...verbose")
 	flag.BoolVar(&amv, "amv", false, "...verbose")
 	flag.BoolVar(&anv, "anv", false, "...verbose")
 	flag.BoolVar(&adv, "adv", false, "...verbose")
+	flag.BoolVar(&atv, "arv", false, "...verbose")
 	flag.BoolVar(&atv, "atv", false, "...verbose"+sep)
 
 	flag.BoolVar(&e_, "e", false, "print all execution info:")
@@ -89,6 +91,9 @@ func flagParse() {
 	if adv {
 		ad = true
 	}
+	if arv {
+		ar = true
+	}
 	if atv {
 		at = true
 	}
@@ -130,9 +135,9 @@ func flagParse() {
 	}
 
 	if a_ {
-		ap, af, an, am, ad, at = true, true, true, true, true, true
+		ap, af, an, am, ad, ar, at = true, true, true, true, true, true, true
 		a_ = false
-	} else if !(ap || af || an || am || ad || at) {
+	} else if !(ap || af || an || am || ad || ar || at) {
 		a_ = true
 	}
 

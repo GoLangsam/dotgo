@@ -103,12 +103,12 @@ func DoIt() error {
 		doit.wg.Wait()                                              // wait for all
 		tempPile = NewNext(0, 0).Action(isTrue)                     // TODO forget temp
 
-		rootTmpl.flagPrint(at, atv, "Main:")
-		metaTmpl.flagPrint(at, atv, "Meta:")
-		doit.ifPrintDataTree(ad, aDot)
+		doit.ifPrintDataTree(ad, adv, aDot)
 		filePile.flagPrint(af, afv, "File:")
 		metaPile.flagPrint(am, amv, "Meta:")
 		baseDict.flagPrint(an, anv, "Base:")
+		rootTmpl.flagPrint(ar, arv, "Root:")
+		metaTmpl.flagPrint(at, atv, "Data:")
 
 		doit.data = NewData(aDot) // forget
 		flagClose(a_, analyse)
