@@ -10,14 +10,7 @@ import (
 	"time"
 )
 
-type dotter string
-
 const (
-	dotWalk dotter = "." // .
-	dotFOut dotter = "-" // -
-	dotTmpl dotter = "~" // ~
-	dotData dotter = "'" // '
-
 	tab = "\t"
 	cnt = "#"
 	arr = "<-"
@@ -45,7 +38,7 @@ func flagOpen(flag bool, prefix string) time.Time {
 }
 
 // flagDot indicates progress within a phase by printing a typical character, iff flag is true
-func flagDot(flag bool, char dotter) {
+func flagDot(flag bool, char string) {
 	if flag {
 		fmt.Print(char)
 	}

@@ -49,10 +49,10 @@ func DoIt() error {
 	doer := func(do func()) *Actor { a := Actor{NewNull(), func(string) { do() }}; return &a }
 
 	// some Null Actors - for flagDot dotter  // ...
-	flagWalk := doer(func() { flagDot(a_, dotWalk) })
-	flagFOut := doer(func() { flagDot(a_, dotFOut) })
-	flagTmpl := doer(func() { flagDot(a_, dotTmpl) })
-	flagData := doer(func() { flagDot(a_, dotData) })
+	flagPrep := doer(func() { flagDot(a_, ".") })
+	flagTemp := doer(func() { flagDot(a_, "-") })
+	flagFile := doer(func() { flagDot(a_, "~") })
+	flagMeta := doer(func() { flagDot(a_, "'") })
 
 	show := func() Actor { return Actor{NewNull(), func(item string) { println("Debug:" + tab + item) }} }
 	_ = show
@@ -74,18 +74,32 @@ func DoIt() error {
 
 		// a temp - for fan-out file names
 		tempPile := NewNext(512, 128).Action(isFile)
+		testPile := NewPrev(256, 064).Action(hasMeta) // templates with non-empty meta: apply in reverse order!
 
-		quit := func() bool { return doit.ctx.Err() != nil }         // quit, iff not doit.ok
-		doit.do(prepDirS.Walker(quit, flagWalk, tempPile, filePile)) // go prepS => temp & file path
-		doit.do(tempPile.Walker(quit, flagFOut, execDict, baseDict)) // go temp => meta & base
-		doit.do(filePile.Walker(quit, flagTmpl, rootTmpl, metaPile)) // go file => rootTmpl
-		doit.do(metaPile.Walker(quit, flagData))                     // go meta => drain
-		doit.wg.Wait()                                               // wait for all
+		quit := func() bool { return doit.ctx.Err() != nil }                   // quit, iff not doit.ok
+		doit.do(prepDirS.Walker(quit, flagPrep, tempPile, filePile))           // go prepS => temp & file path
+		doit.do(tempPile.Walker(quit, flagTemp, execDict, baseDict, testPile)) // go temp => exec & meta & test
+		doit.do(testPile.Walker(quit))                                         // TODO go test => ./.
+		doit.do(filePile.Walker(quit, flagFile, rootTmpl, metaPile))           // go file => rootTmpl & meta (*this* works!?!)
+		doit.do(metaPile.Walker(quit, flagMeta))                               // go meta => drain
+		doit.wg.Wait()                                                         // wait for all
+
+		x := metaPile.S()
+		y := testPile.S()
+		if len(x) != len(y) {
+			println("Sizes differ: meta =", len(x), "test =", len(y))
+		}
+
+		x = tempPile.S()
+		y = filePile.S()
+		if len(x) != len(y) {
+			println("Sizes differ: temp =", len(x), "file =", len(y))
+		}
 
 		tmpl, err := rootTmpl.it.(Template).Clone()                 // Clone rootTmpl
 		rootData.SeeError("Clone", "Root", err)                     // err? ignore for now
 		metaTmpl := Template{tmpl}.metaParser(rootData, lookupData) // text/template from meta
-		doit.do(metaPile.Walker(quit, flagData, metaTmpl))          // go meta => metaTmpl & metaData
+		doit.do(metaPile.Walker(quit, flagMeta, metaTmpl))          // go meta => metaTmpl & metaData
 		doit.wg.Wait()                                              // wait for all
 		tempPile = NewNext(0, 0).Action(isTrue)                     // TODO forget temp
 
