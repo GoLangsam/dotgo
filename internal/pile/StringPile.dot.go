@@ -135,7 +135,7 @@ func (d *StringPile) Done() (done <-chan []string) {
 		d.offset = 0
 		if len(d.list) > d.offset {
 			// skip what's already known
-			d.offset = len(d.list) - 1
+			d.offset = len(d.list)
 		}
 		for _, ok := d.Next(); ok; _, ok = d.Next() {
 			// keep draining
