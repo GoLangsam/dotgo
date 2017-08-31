@@ -13,7 +13,7 @@ func (template Template) tmplParser(
 		var err error
 		text := get(item)
 		name := nameLessExt(item)
-		_, err = nameParse(template, name, text)
+		_, err = template.nameParse(name, text)
 		data.SeeError("CollectTmpl: Parse:", name, err)
 	}}
 }
@@ -33,10 +33,25 @@ func (template Template) metaParser(
 		meta, err := Meta(text) // extract meta-data
 		data.SeeError("CollectMeta: Extract:", name, err)
 
-		tmpl, err := nameParse(template, name, meta) // Parse the meta-data
+		tmpl, err := template.nameParse(name, meta) // Parse the meta-data
 		data.SeeError("CollectMeta: Parse:", name, err)
 
 		_, err = Apply(data, tmpl, name)
 		data.SeeError("CollectMeta: Apply:", name, err)
 	}}
+}
+
+// nameParse is slightly similar to ParseFiles
+func (template Template) nameParse(name, body string) (Template, error) {
+
+	var err error
+	var tmpl Template
+	if name == template.Name() {
+		tmpl = template
+	} else {
+		tmpl = Template{template.New(name)}
+	}
+
+	_, err = tmpl.Parse(body) // Parse the data
+	return tmpl, err
 }
