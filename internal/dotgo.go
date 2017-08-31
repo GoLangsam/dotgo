@@ -12,6 +12,6 @@ import (
 
 func main() {
 	if err := doit.DoIt(); err != nil {
-		fmt.Println(err)
+		fmt.Println("Error:", err)
 	}
 }
