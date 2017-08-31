@@ -4,27 +4,25 @@
 
 package gen
 
-func tmplParser(
-	template Template,
+func (template Template) tmplParser(
 	data Dot,
 	get func(string) string,
-) itemDo {
-	return func(item string) {
+) Actor {
+	return Actor{template, func(item string) {
 
 		var err error
 		text := get(item)
 		name := nameLessExt(item)
 		_, err = nameParse(template, name, text)
 		data.SeeError("CollectTmpl: Parse:", name, err)
-	}
+	}}
 }
 
-func metaParser(
-	template Template,
+func (template Template) metaParser(
 	data Dot,
 	get func(string) string,
-) itemDo {
-	return func(item string) {
+) Actor {
+	return Actor{template, func(item string) {
 
 		var err error
 		println("MetaParse: " + item)
@@ -40,5 +38,5 @@ func metaParser(
 
 		_, err = Apply(data, tmpl, name)
 		data.SeeError("CollectMeta: Apply:", name, err)
-	}
+	}}
 }

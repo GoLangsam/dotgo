@@ -50,15 +50,15 @@ func DoIt() error {
 	}
 
 	// Actors - Some containers, and how to populate each
-	fileMake := NewNext(512, 128).Action(isFile)  // files (templates) to handle
-	metaMake := NewPrev(256, 064).Action(hasMeta) // templates with non-empty meta: apply in reverse order!
-	baseMake := NewDict().Action(isBase)          // templates to execute: basenames found
-	execMake := NewDict().Action(isExec)          // TODO this is wrong: we need the directory! nameLessExt get's appended to base            // mathching file(s) identify folder(s) for execution
-	rootTmpl := NewTemplate(aDot)                 // text/template
-	metaTmpl := NewTemplate(aDot)                 // text/template for metaParser
-	rootData := NewData(aDot)                     // data - a Dot
-	metaData := NewData(aDot)                     // data for metaParser
-	doit := doIt(rootData)                        // carries context, and data
+	fileMake := NewNext(512, 128).Action(isFile)                   // files (templates) to handle
+	metaMake := NewPrev(256, 064).Action(hasMeta)                  // templates with non-empty meta: apply in reverse order!
+	baseMake := NewDict().Action(isBase)                           // templates to execute: basenames found
+	execMake := NewDict().Action(isExec)                           // TODO this is wrong: we need the directory! nameLessExt get's appended to base            // mathching file(s) identify folder(s) for execution
+	rootData := NewData(aDot)                                      // data - a Dot
+	metaData := NewData(aDot)                                      // data for metaParser
+	rootTmpl := NewTemplate(aDot).tmplParser(rootData, lookupData) // text/template
+	metaTmpl := NewTemplate(aDot).metaParser(metaData, lookupData) // text/template from meta
+	doit := doIt(rootData)                                         // carries context, and data
 
 	// doer - just do something
 	doer := func(do itemDo) Actor {
@@ -80,13 +80,10 @@ func DoIt() error {
 		// a temp - for fan-out file names
 		tempMake := NewNext(128, 32).Action(isTrue)
 
-		tmplParse := doer(tmplParser(rootTmpl, rootData, lookupData))
-		metaParse := doer(metaParser(metaTmpl, metaData, lookupData))
-
 		doit.do(prepDirS.Walker(doit, flagWalk, tempMake, fileMake)) // go prepS => temp & file path
 		doit.do(tempMake.Walker(doit, flagFOut, metaMake, baseMake)) // go temp => meta & base
-		doit.do(fileMake.Walker(doit, flagTmpl, tmplParse))          // go file => rootTmpl
-		doit.do(metaMake.Walker(doit, flagData, metaParse))          // go meta => metaTmpl & metaData
+		doit.do(fileMake.Walker(doit, flagTmpl, rootTmpl))           // go file => rootTmpl
+		doit.do(metaMake.Walker(doit, flagData, metaTmpl))           // go meta => metaTmpl & metaData
 		doit.wg.Wait()                                               // wait for all
 		tempMake = NewNext(0, 0).Action(isTrue)                      // forget temp
 
