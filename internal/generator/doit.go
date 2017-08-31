@@ -70,7 +70,7 @@ func DoIt() error {
 
 	if doit.ctx.Err() == nil && len(prepDirS) > 0 { // Beg of prep Analysis
 		analyse := flagOpen(a_, "Prepare:")
-		prepDirS.flagPrint(ap, ap, "Prep:")
+		prepDirS.flagPrint(ap, apv, "Prep:")
 
 		// a temp - for fan-out file names
 		tempPile := NewNext(512, 128).Action(isFile)
