@@ -33,7 +33,7 @@ type Template interface {
 
 // New returns a new template with funcmap attached and delimiters set
 func New(name string) *template.Template {
-	return template.New(name).Funcs(Funcs).Delims(tmplL, tmplR)
+	return template.New(name).Delims(tmplL, tmplR)
 }
 
 // Names returns the sorted names of the templates referenced by tmpl
