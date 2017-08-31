@@ -41,7 +41,6 @@ func DoIt() error {
 	execMatch := matchFunc(patterns[len(patterns)-1])
 	//fakeMatch := matchBool(true)
 
-	// Containers - mostly Item's
 	filePile := NewNext(512, 128) // files (templates) to handle
 	//metaPile := NewPrev(256, 64)     // templates with non-empty meta: apply in reverse order!
 	metaPile := NewPrev(256, 0)      // templates with non-empty meta: apply in reverse order!

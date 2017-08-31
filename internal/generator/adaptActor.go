@@ -5,7 +5,7 @@
 package gen
 
 type Actor struct {
-	it Item   // any collection which implements Closer
+	it Some   // any collection which implements Closer
 	do itemDo // what to do to it
 }
 
