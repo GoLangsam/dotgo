@@ -16,16 +16,17 @@ func Write(data Dot, filename string, byteS []byte) error {
 
 // FileName resolves name as a template, executed against data
 func FileName(data Dot, name string) string {
+	id := "FileName"
 	fileName := name
-	template := NewTemplate("FileName")
-	if tmpl, err := template.Make("FileName", fileName); err == nil {
-		if byteS, err := Apply(data, tmpl, "FileName"); err == nil {
+	template := NewTemplate(id)
+	if tmpl, err := template.Parse(fileName); err == nil {
+		if byteS, err := Apply(data, Template{tmpl}, id); err == nil {
 			fileName = string(byteS)
 		} else {
-			panic("Filename: Apply: Error: " + err.Error())
+			panic(id + ": Apply: Error: " + err.Error())
 		}
 	} else {
-		panic("Filename: Parse: Error: " + err.Error())
+		panic(id + ": Parse: Error: " + err.Error())
 	}
 	return fileName
 }
