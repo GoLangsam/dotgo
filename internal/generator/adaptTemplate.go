@@ -17,14 +17,7 @@ type Template struct {
 // NewTemplate returns a new template
 // with funcmap attached and delimiters set
 func NewTemplate(name string) Template {
-	return Template{t.New(name)}
-}
-
-// Make returns a fresh Template made from parsing body
-func (template Template) Make(name, body string) (new Template, err error) {
-	tmpl, err := t.New(name).Parse(body)
-	new = Template{tmpl}
-	return new, err
+	return Template{t.New(name).Funcs(Funcs)}
 }
 
 // Meta returns the meta-text extraced from text

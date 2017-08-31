@@ -4,6 +4,20 @@
 
 package gen
 
+func nameParse(template Template, name, body string) (Template, error) {
+
+	var err error
+	var tmpl Template
+	if name == template.Name() {
+		tmpl = template
+	} else {
+		tmpl = Template{template.New(name)}
+	}
+
+	_, err = tmpl.Parse(body) // Parse the data
+	return tmpl, err
+}
+
 func tmplParser(
 	t *toDo,
 	get func(string) string,
@@ -13,8 +27,7 @@ func tmplParser(
 		var err error
 		text := get(item)
 		name := nameLessExt(item)
-
-		t.tmpl, err = t.tmpl.Make(name, text) // Parse the data
+		t.tmpl, err = nameParse(t.tmpl, name, text)
 		t.data.SeeError("CollectTmpl: Parse:", name, err)
 	}
 }
@@ -34,7 +47,7 @@ func metaParser(
 		meta, err := Meta(text) // extract meta-data
 		t.data.SeeError("CollectMeta: Extract:", name, err)
 
-		t.tmpl, err = t.tmpl.Make(name, meta) // Parse the meta-data
+		t.tmpl, err = nameParse(t.tmpl, name, meta) // Parse the meta-data
 		t.data.SeeError("CollectMeta: Parse:", name, err)
 
 		_, err = Apply(t.data, t.tmpl, name)
