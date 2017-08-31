@@ -39,11 +39,11 @@ func New(name string) *template.Template {
 // Names returns the sorted names of the templates referenced by tmpl
 func Names(tmpl Template) (names []string) {
 	tS := tmpl.Templates()
-	sort.Slice(tS, func(i, j int) bool { return (tS[i].Name() < tS[j].Name()) })
 	for i := range tS {
 		names = append(names, tS[i].Name())
 	}
-	return
+	sort.Slice(names, func(i, j int) bool { return (names[i] < names[j]) })
+	return names
 }
 
 // Meta returns the meta-text extraced from text
