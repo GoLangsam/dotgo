@@ -29,22 +29,17 @@ func DoIt() error {
 	execDirS := AsDirS(pathS[split:]) // - execute only last
 
 	fsCache := fic.New()
-
-	// lookupData retrieves the data related to file from cache
-	lookupData := func(path string) string {
-		return fsCache.LookupData(path)
-	}
+	lookupData := func(path string) string { return fsCache.LookupData(path) }
 
 	suffix := filepath.SplitList(tmplread)
 	isFile := matchFunc(suffix...)
 	isBase := matchFunc(suffix[0])
 	isExec := matchFunc(suffix[len(suffix)-1])
 	isTrue := matchBool(true)
-
 	hasMeta := func(item string) bool {
 		meta, err := Meta(lookupData(item))
 		if err != nil {
-			panic(err)
+			panic(err) // TODO don't panic
 		}
 		return meta != ""
 	}
@@ -61,15 +56,13 @@ func DoIt() error {
 	doit := doIt(rootData)                                         // carries context, and data
 
 	// doer - just do something
-	doer := func(do itemDo) Actor {
-		return Actor{NewNull(), do}
-	}
+	doer := func(do func()) Actor { return Actor{NewNull(), func(string) { do() }} }
 
 	// some Null Actors - for flagDot dotter  // ...
-	flagWalk := doer(func(string) { flagDot(a_, dotWalk) })
-	flagFOut := doer(func(string) { flagDot(a_, dotFOut) })
-	flagTmpl := doer(func(string) { flagDot(a_, dotTmpl) })
-	flagData := doer(func(string) { flagDot(a_, dotData) })
+	flagWalk := doer(func() { flagDot(a_, dotWalk) })
+	flagFOut := doer(func() { flagDot(a_, dotFOut) })
+	flagTmpl := doer(func() { flagDot(a_, dotTmpl) })
+	flagData := doer(func() { flagDot(a_, dotData) })
 
 	// End of Prolog
 
