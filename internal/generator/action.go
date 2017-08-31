@@ -5,8 +5,8 @@
 package gen
 
 func tmplParser(
-	t *toDo,
 	template Template,
+	data Dot,
 	get func(string) string,
 ) itemDo {
 	return func(item string) {
@@ -15,13 +15,13 @@ func tmplParser(
 		text := get(item)
 		name := nameLessExt(item)
 		_, err = nameParse(template, name, text)
-		t.data.SeeError("CollectTmpl: Parse:", name, err)
+		data.SeeError("CollectTmpl: Parse:", name, err)
 	}
 }
 
 func metaParser(
-	t *toDo,
 	template Template,
+	data Dot,
 	get func(string) string,
 ) itemDo {
 	return func(item string) {
@@ -33,12 +33,12 @@ func metaParser(
 		name := nameLessExt(item) + ".meta"
 
 		meta, err := Meta(text) // extract meta-data
-		t.data.SeeError("CollectMeta: Extract:", name, err)
+		data.SeeError("CollectMeta: Extract:", name, err)
 
 		tmpl, err := nameParse(template, name, meta) // Parse the meta-data
-		t.data.SeeError("CollectMeta: Parse:", name, err)
+		data.SeeError("CollectMeta: Parse:", name, err)
 
-		_, err = Apply(t.data, tmpl, name)
-		t.data.SeeError("CollectMeta: Apply:", name, err)
+		_, err = Apply(data, tmpl, name)
+		data.SeeError("CollectMeta: Apply:", name, err)
 	}
 }

@@ -55,14 +55,21 @@ func DoIt() error {
 	baseMake := NewDict().Action(isBase)          // templates to execute: basenames found
 	execMake := NewDict().Action(isExec)          // TODO this is wrong: we need the directory! nameLessExt get's appended to base            // mathching file(s) identify folder(s) for execution
 	rootTmpl := NewTemplate(aDot)                 // text/template
+	metaTmpl := NewTemplate(aDot)                 // text/template for metaParser
 	rootData := NewData(aDot)                     // data - a Dot
+	metaData := NewData(aDot)                     // data for metaParser
 	doit := doIt(rootData)                        // carries context, and data
 
+	// doer - just do something
+	doer := func(do itemDo) Actor {
+		return Actor{NewNull(), do}
+	}
+
 	// some Null Actors - for flagDot dotter  // ...
-	flagWalk := Actor{NewNull(), func(item string) { flagDot(a_, dotWalk) }}
-	flagFOut := Actor{NewNull(), func(item string) { flagDot(a_, dotFOut) }}
-	flagTmpl := Actor{NewNull(), func(item string) { flagDot(a_, dotTmpl) }}
-	flagData := Actor{NewNull(), func(item string) { flagDot(a_, dotData) }}
+	flagWalk := doer(func(string) { flagDot(a_, dotWalk) })
+	flagFOut := doer(func(string) { flagDot(a_, dotFOut) })
+	flagTmpl := doer(func(string) { flagDot(a_, dotTmpl) })
+	flagData := doer(func(string) { flagDot(a_, dotData) })
 
 	// End of Prolog
 
@@ -73,17 +80,18 @@ func DoIt() error {
 		// a temp - for fan-out file names
 		tempMake := NewNext(128, 32).Action(isTrue)
 
-		tmplParse := Actor{tempMake.it, tmplParser(doit, rootTmpl, lookupData)}          // => doit.tmpl
-		metaParse := Actor{metaMake.it, metaParser(doit, NewTemplate(aDot), lookupData)} // => doit.tmpl
+		tmplParse := doer(tmplParser(rootTmpl, rootData, lookupData))
+		metaParse := doer(metaParser(metaTmpl, metaData, lookupData))
 
 		doit.do(prepDirS.Walker(doit, flagWalk, tempMake, fileMake)) // go prepS => temp & file path
-		doit.do(tempMake.Walker(doit, flagTmpl, tmplParse))          // go temp => doit.tmpl
-		doit.do(fileMake.Walker(doit, flagFOut, metaMake, baseMake)) // go path => meta & base
-		doit.do(metaMake.Walker(doit, flagData, metaParse))          // go meta => drain
+		doit.do(tempMake.Walker(doit, flagFOut, metaMake, baseMake)) // go temp => meta & base
+		doit.do(fileMake.Walker(doit, flagTmpl, tmplParse))          // go file => rootTmpl
+		doit.do(metaMake.Walker(doit, flagData, metaParse))          // go meta => metaTmpl & metaData
 		doit.wg.Wait()                                               // wait for all
 		tempMake = NewNext(0, 0).Action(isTrue)                      // forget temp
 
 		rootTmpl.flagPrint(at, atv, "Main:")
+		metaTmpl.flagPrint(at, atv, "Meta:")
 		doit.ifPrintDataTree(ad, aDot)
 		fileMake.flagPrint(af, afv, "File:")
 		metaMake.flagPrint(am, amv, "Meta:")
