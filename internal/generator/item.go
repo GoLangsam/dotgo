@@ -6,7 +6,6 @@ package gen
 
 // Item represents our string-based collections
 type Item interface {
-	Add(item string)                     // add item to content
 	S() []string                         // content as stringS
 	Walker(t *toDo, out ...Actor) func() // provide traversal - interruptable
 	Close() error                        // mimic io.Closer - definded locally in order to avoid explicit dependency

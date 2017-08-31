@@ -54,7 +54,7 @@ func DoIt() error {
 	// Actors - how to populate each Container
 	fileMake := Actor{filePile, func(item string) {
 		if fileMatch(item) {
-			filePile.Add(item)
+			filePile.Pile(item)
 		}
 	}}
 
@@ -62,7 +62,7 @@ func DoIt() error {
 		println("\nCheck Meta " + item)
 		meta, err := Meta(lookupData(item))
 		if err == nil && meta != "" {
-			metaPile.Add(item)
+			metaPile.Pile(item)
 			println("\nFound Meta " + item)
 		} else if err != nil {
 			panic(err)
@@ -71,13 +71,13 @@ func DoIt() error {
 
 	baseMake := Actor{baseDict, func(item string) {
 		if baseMatch(item) {
-			baseDict.Add(nameLessExt(item))
+			baseDict.Assign(nameLessExt(item), nil)
 		}
 	}}
 
 	execMake := Actor{execDict, func(item string) {
 		if execMatch(item) {
-			execDict.Add(nameLessExt(item)) // TODO this is wrong: we need the directory! nameLessExt get's appended to base
+			execDict.Assign(nameLessExt(item), nil) // TODO this is wrong: we need the directory! nameLessExt get's appended to base
 		}
 	}}
 
@@ -105,7 +105,7 @@ func DoIt() error {
 		// a temp Pile - fan out file names
 		tempPile := NewNext(128, 32)
 		tempMake := Actor{tempPile, func(item string) {
-			tempPile.Add(item)
+			tempPile.Pile(item)
 		}}
 
 		tmplParse := Actor{tempPile, tmplParser(doit, lookupData)} // => doit.tmpl

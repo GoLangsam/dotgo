@@ -21,7 +21,3 @@ func (n Null) Close() error {
 func (n Null) Walker(t *toDo, out ...Actor) func() {
 	return func() { return }
 }
-
-func (n Null) Add(item string) {
-	// nop
-}

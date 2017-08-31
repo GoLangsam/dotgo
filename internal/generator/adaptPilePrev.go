@@ -18,16 +18,6 @@ func NewPrev(size, buff int) nextPile {
 	return nextPile{gen.MakeStringPile(size, buff)}
 }
 
-func (p prevPile) Add(item string) {
-	p.Pile(item)
-}
-
-func (p prevPile) Adder() itemDo {
-	return func(item string) {
-		p.Pile(item)
-	}
-}
-
 func (p prevPile) S() []string {
 	return <-p.Done()
 }
