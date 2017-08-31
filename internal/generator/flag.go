@@ -34,6 +34,7 @@ func init() {
 
 	flag.BoolVar(&apv, "apv", false, "...verbose")
 	flag.BoolVar(&afv, "afv", false, "...verbose")
+	flag.BoolVar(&amv, "amv", false, "...verbose")
 	flag.BoolVar(&anv, "anv", false, "...verbose")
 	flag.BoolVar(&adv, "adv", false, "...verbose")
 	flag.BoolVar(&atv, "atv", false, "...verbose"+sep)
