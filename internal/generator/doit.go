@@ -35,11 +35,11 @@ func DoIt() error {
 		return fsCache.LookupData(path)
 	}
 
-	patterns := filepath.SplitList(tmplread)
-	fileMatch := matchFunc(patterns...)
-	baseMatch := matchFunc(patterns[0])
-	execMatch := matchFunc(patterns[len(patterns)-1])
-	//fakeMatch := matchBool(true)
+	suffix := filepath.SplitList(tmplread)
+	isFile := matchFunc(suffix...)
+	isBase := matchFunc(suffix[0])
+	isExec := matchFunc(suffix[len(suffix)-1])
+	//isTrue := matchBool(true)
 
 	filePile := NewNext(512, 128) // files (templates) to handle
 	//metaPile := NewPrev(256, 64)     // templates with non-empty meta: apply in reverse order!
@@ -52,7 +52,7 @@ func DoIt() error {
 
 	// Actors - how to populate each Container
 	fileMake := Actor{filePile, func(item string) {
-		if fileMatch(item) {
+		if isFile(item) {
 			filePile.Pile(item)
 		}
 	}}
@@ -69,13 +69,13 @@ func DoIt() error {
 	}}
 
 	baseMake := Actor{baseDict, func(item string) {
-		if baseMatch(item) {
+		if isBase(item) {
 			baseDict.Assign(nameLessExt(item), nil)
 		}
 	}}
 
 	execMake := Actor{execDict, func(item string) {
-		if execMatch(item) {
+		if isExec(item) {
 			execDict.Assign(nameLessExt(item), nil) // TODO this is wrong: we need the directory! nameLessExt get's appended to base
 		}
 	}}
