@@ -65,7 +65,7 @@ func init() {
 	flag.BoolVar(&exe, "x", false, "execute: safe resulting text")
 	flag.BoolVar(&ugo, "xgo", false, "execute: safe raw text (as *.ugo)"+sep)
 
-	flag.StringVar(&tmplread, "ext", "*.go.tmpl;*.tmpl;dot.go.tmpl",
+	flag.StringVar(&tmplread, "ext", ".go.tmpl;.tmpl;dot.go.tmpl",
 		"pattern list to match template file names"+
 			"\tNote:"+
 			"\n\tA template gets executed iff first pattern matches it's file!"+

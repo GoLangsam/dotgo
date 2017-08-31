@@ -28,14 +28,13 @@ func matchBool(flag bool) itemIs {
 
 // matchFunc - iff filename matches any pattern
 func matchFunc(pattern ...string) itemIs {
-	return func(path string) (matched bool) {
+	return func(path string) bool {
 		for i := range pattern {
-			matched, _ = filepath.Match(pattern[i], filepath.Base(path)) // ignore errors
-			if matched {
-				break
+			if strings.HasSuffix(path, pattern[i]) {
+				return true
 			}
 		}
-		return matched
+		return false
 	}
 }
 
