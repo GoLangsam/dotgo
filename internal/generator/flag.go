@@ -9,14 +9,14 @@ import (
 )
 
 var (
-	a_, ad, ar, at, af, an, am, ap    bool   // print analysis
-	adv, arv, atv, afv, anv, amv, apv bool   // ...verbose
-	e_, ea, ed, et, el                bool   // print exec
-	eav, edv, etv, elv                bool   // ...verbose
-	w_, wd, wf, wr                    bool   // print write
-	wdv, wfv, wrv                     bool   // ...verbose
-	exe, ugo, nof, nox, nos           bool   // write
-	tmplread                          string // TODO change default (& exf) acc to new 'type'-switch: md txt wiki ...
+	a_, aa, ad, ar, at, af, an, am, ap     bool   // print analysis
+	aav, adv, arv, atv, afv, anv, amv, apv bool   // ...verbose
+	e_, ea, ed, et, el                     bool   // print exec
+	eav, edv, etv, elv                     bool   // ...verbose
+	w_, wd, wf, wr                         bool   // print write
+	wdv, wfv, wrv                          bool   // ...verbose
+	exe, ugo, nof, nox, nos                bool   // write
+	tmplread                               string // TODO change default (& exf) acc to new 'type'-switch: md txt wiki ...
 )
 
 func init() {
@@ -25,6 +25,7 @@ func init() {
 	const sep = new + lin + lin + lin + lin + lin + lin + lin + lin + lin + lin + new
 
 	flag.BoolVar(&a_, "a", false, "print all analysis info:")
+	flag.BoolVar(&aa, "aa", false, "print analysis arguments(s)")
 	flag.BoolVar(&ap, "ap", false, "print analysis path(s)")
 	flag.BoolVar(&af, "af", false, "print analysis files")
 	flag.BoolVar(&an, "an", false, "print analysis names")
@@ -33,6 +34,7 @@ func init() {
 	flag.BoolVar(&ar, "ar", false, "print analysis root template names")
 	flag.BoolVar(&at, "at", false, "print analysis meta template names")
 
+	flag.BoolVar(&aav, "aav", false, "...verbose")
 	flag.BoolVar(&apv, "apv", false, "...verbose")
 	flag.BoolVar(&afv, "afv", false, "...verbose")
 	flag.BoolVar(&amv, "amv", false, "...verbose")
@@ -88,6 +90,9 @@ func init() {
 func flagParse() {
 	flag.Parse()
 
+	if aav {
+		aa = true
+	}
 	if adv {
 		ad = true
 	}
@@ -135,9 +140,9 @@ func flagParse() {
 	}
 
 	if a_ {
-		ap, af, an, am, ad, ar, at = true, true, true, true, true, true, true
+		aa, ap, af, an, am, ad, ar, at = true, true, true, true, true, true, true, true
 		a_ = false
-	} else if !(ap || af || an || am || ad || ar || at) {
+	} else if !(aa || ap || af || an || am || ad || ar || at) {
 		a_ = true
 	}
 

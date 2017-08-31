@@ -22,7 +22,7 @@ func DoIt() error {
 	// Beg of Prolog - we have something to declare
 
 	pathS := AsDirS(dotpath.DotPathS(flagArgs()...))
-	pathS.flagPrint(ap, apv, "Args:")
+	pathS.flagPrint(aa, aav, "aa-Args:")
 
 	split := len(pathS) - 1           // at last:
 	prepDirS := AsDirS(pathS[:split]) // - prepare all but last
@@ -70,7 +70,7 @@ func DoIt() error {
 
 	if doit.ctx.Err() == nil && len(prepDirS) > 0 { // Beg of prep Analysis
 		analyse := flagOpen(a_, "Prepare:")
-		prepDirS.flagPrint(ap, apv, "Prep:")
+		prepDirS.flagPrint(ap, apv, "ap-Prep:")
 
 		// a temp - for fan-out file names
 		tempPile := NewNext(512, 128).Action(isFile)
@@ -103,12 +103,12 @@ func DoIt() error {
 		doit.wg.Wait()                                              // wait for all
 		tempPile = NewNext(0, 0).Action(isTrue)                     // TODO forget temp
 
-		doit.ifPrintDataTree(ad, adv, aDot)
-		filePile.flagPrint(af, afv, "File:")
-		metaPile.flagPrint(am, amv, "Meta:")
-		baseDict.flagPrint(an, anv, "Base:")
-		rootTmpl.flagPrint(ar, arv, "Root:")
-		metaTmpl.flagPrint(at, atv, "Data:")
+		filePile.flagPrint(af, afv, "af-File:")
+		metaPile.flagPrint(am, amv, "am-Meta:")
+		baseDict.flagPrint(an, anv, "an-Name:")
+		rootTmpl.flagPrint(ar, arv, "ar-Root:")
+		metaTmpl.flagPrint(at, atv, "at-Data:")
+		doit.ifPrintDataTree(ad, adv, "ad-"+aDot+aDot+aDot+aDot+":")
 
 		doit.data = NewData(aDot) // forget
 		flagClose(a_, analyse)
