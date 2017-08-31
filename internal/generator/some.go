@@ -6,9 +6,9 @@ package gen
 
 // Some represents our walkable collections which may contain some strings
 type Some interface {
-	S() []string                         // content as stringS
-	Walker(t *toDo, out ...Actor) func() // provide traversal - interruptable
-	Close() error                        // mimic io.Closer - definded locally in order to avoid explicit dependency
+	S() []string                                  // content as stringS
+	Walker(quit func() bool, out ...Actor) func() // provide traversal - interruptable
+	Close() error                                 // mimic io.Closer - definded locally in order to avoid explicit dependency
 	flagPrint(flag, verbose bool, header string)
 }
 

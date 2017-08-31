@@ -17,8 +17,8 @@ func (m Actor) Close() error {
 	return m.it.Close()
 }
 
-func (m Actor) Walker(t *toDo, out ...Actor) func() {
-	return m.it.Walker(t, out...)
+func (m Actor) Walker(quit func() bool, out ...Actor) func() {
+	return m.it.Walker(quit, out...)
 }
 
 func ActorsClose(out ...Actor) {

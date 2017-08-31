@@ -29,7 +29,7 @@ func (d DirS) Close() error {
 	return nil
 }
 
-func (d DirS) Walker(t *toDo, out ...Actor) func() {
+func (d DirS) Walker(quit func() bool, out ...Actor) func() {
 
 	return func() {
 
@@ -39,9 +39,9 @@ func (d DirS) Walker(t *toDo, out ...Actor) func() {
 			return nil
 		}
 
-		for i := 0; i < len(d) && t.ok(); i++ {
-			dh := ifFlagSkipDirWf(matchBool(d[i].Recurse)) // Recurse?
-			filepath.Walk(d[i].DirPath, t.isDirWf(dh, fh)) // Walk path
+		for i := 0; i < len(d) && !quit(); i++ {
+			dh := ifFlagSkipDirWf(matchBool(d[i].Recurse))     // Recurse?
+			filepath.Walk(d[i].DirPath, isDirWf(quit, dh, fh)) // Walk path
 		}
 	}
 }

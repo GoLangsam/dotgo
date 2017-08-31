@@ -29,10 +29,6 @@ func (t *toDo) doIt(data *dot.Dot) *toDo {
 	return &toDo{data, t.ctx, t.can, t.wg}
 }
 
-func (t *toDo) ok() bool {
-	return t.ctx.Err() == nil
-}
-
 func (t *toDo) do(do func()) {
 	t.wg.Add(1)
 

@@ -183,7 +183,7 @@ func (data Dot) flagPrint(flag bool, header string) {
 
 // ifPrintDataTree prints the data tree, iff flag is true
 func (t *toDo) ifPrintDataTree(flag bool, header string) {
-	if flag && t.ok() {
+	if flag {
 		flagPrintDataTree(true, t.data, header)
 		if true {
 			fmt.Println()

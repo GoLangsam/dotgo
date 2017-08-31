@@ -22,12 +22,12 @@ func (p prevPile) S() []string {
 	return <-p.Done()
 }
 
-func (p prevPile) Walker(t *toDo, out ...Actor) func() {
+func (p prevPile) Walker(quit func() bool, out ...Actor) func() {
 
 	return func() {
 
 		defer ActorsClose(out...)
-		for item, ok := p.Iter(); ok && t.ok(); item, ok = p.Next() { // TODO must reverse!
+		for item, ok := p.Iter(); ok && !quit(); item, ok = p.Next() { // TODO must reverse!
 			ActorsDo(item, out...)
 		}
 	}

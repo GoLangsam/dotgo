@@ -23,13 +23,13 @@ func (d Dict) Close() error {
 	return nil
 }
 
-func (d Dict) Walker(t *toDo, out ...Actor) func() {
+func (d Dict) Walker(quit func() bool, out ...Actor) func() {
 
 	return func() {
 
 		defer ActorsClose(out...)
 		for _, item := range d.S() {
-			if !t.ok() {
+			if quit() {
 				return // bail out
 			}
 			ActorsDo(item, out...)

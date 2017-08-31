@@ -18,6 +18,6 @@ func (n Null) Close() error {
 	return nil
 }
 
-func (n Null) Walker(t *toDo, out ...Actor) func() {
+func (n Null) Walker(quit func() bool, out ...Actor) func() {
 	return func() { return }
 }

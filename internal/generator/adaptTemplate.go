@@ -29,13 +29,13 @@ func (template Template) Close() error {
 	return nil
 }
 
-func (template Template) Walker(t *toDo, out ...Actor) func() {
+func (template Template) Walker(quit func() bool, out ...Actor) func() {
 
 	return func() {
 
 		defer ActorsClose(out...)
 		for _, item := range template.S() {
-			if !t.ok() {
+			if quit() {
 				return // bail out
 			}
 			ActorsDo(item, out...)

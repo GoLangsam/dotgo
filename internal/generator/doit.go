@@ -66,17 +66,18 @@ func DoIt() error {
 
 	// End of Prolog
 
-	if doit.ok() && len(prepDirS) > 0 { // Beg of prep Analysis
+	if doit.ctx.Err() == nil && len(prepDirS) > 0 { // Beg of prep Analysis
 		analyse := flagOpen(a_, "Prepare:")
 		prepDirS.flagPrint(ap, ap, "Prep:")
 
 		// a temp - for fan-out file names
 		tempMake := NewNext(128, 32).Action(isTrue)
 
-		doit.do(prepDirS.Walker(doit, flagWalk, tempMake, fileMake)) // go prepS => temp & file path
-		doit.do(tempMake.Walker(doit, flagFOut, metaMake, baseMake)) // go temp => meta & base
-		doit.do(fileMake.Walker(doit, flagTmpl, rootTmpl))           // go file => rootTmpl
-		doit.do(metaMake.Walker(doit, flagData, metaTmpl))           // go meta => metaTmpl & metaData
+		quit := func() bool { return doit.ctx.Err() != nil }         // quit, iff not doit.ok
+		doit.do(prepDirS.Walker(quit, flagWalk, tempMake, fileMake)) // go prepS => temp & file path
+		doit.do(tempMake.Walker(quit, flagFOut, metaMake, baseMake)) // go temp => meta & base
+		doit.do(fileMake.Walker(quit, flagTmpl, rootTmpl))           // go file => rootTmpl
+		doit.do(metaMake.Walker(quit, flagData, metaTmpl))           // go meta => metaTmpl & metaData
 		doit.wg.Wait()                                               // wait for all
 		tempMake = NewNext(0, 0).Action(isTrue)                      // forget temp
 
@@ -91,7 +92,7 @@ func DoIt() error {
 		flagClose(a_, analyse)
 	} // End of prep Analysis
 
-	if doit.ok() && !nox && !doit.ifPrintErrors("Prepare Main:") {
+	if doit.ctx.Err() == nil && !nox && !doit.ifPrintErrors("Prepare Main:") {
 		//	todo.Execute()
 		err := doit.exec(execDirS, fileMake, baseMake, metaMake, execMake, lookupData) // Execute
 		if err != nil && !doit.ifPrintErrors("Prepare Exec:") {                        // abort?

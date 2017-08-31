@@ -47,10 +47,10 @@ func ifFlagSkipDirWf(match itemIs) filepath.WalkFunc {
 	}
 }
 
-func (t *toDo) isDirWf(dirWf, filWf filepath.WalkFunc) filepath.WalkFunc {
+func isDirWf(quit func() bool, dirWf, filWf filepath.WalkFunc) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		switch {
-		case t.ctx.Err() != nil:
+		case quit():
 			return filepath.SkipDir
 		case info.IsDir():
 			return dirWf(path, info, err)
