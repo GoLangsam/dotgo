@@ -32,3 +32,14 @@ func (p nextPile) Walker(t *toDo, out ...Actor) func() {
 		}
 	}
 }
+
+func (p nextPile) Action(is ...itemIs) Actor {
+	return Actor{p, func(item string) {
+		for i := range is {
+			if is[i](item) {
+				p.Pile(item)
+				return
+			}
+		}
+	}}
+}

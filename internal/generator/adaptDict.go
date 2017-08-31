@@ -36,3 +36,14 @@ func (d Dict) Walker(t *toDo, out ...Actor) func() {
 		}
 	}
 }
+
+func (d Dict) Action(is ...itemIs) Actor {
+	return Actor{d, func(item string) {
+		for i := range is {
+			if is[i](item) {
+				d.Assign(nameLessExt(item), nil)
+				return
+			}
+		}
+	}}
+}
