@@ -106,7 +106,6 @@ func (d DirS) flagPrint(flag, verbose bool, header string) {
 		if verbose {
 			for i := range d {
 				flagPrintString(flag, tab+d[i].DirPath, dots(d[i].Recurse))
-				// fmt.Println(tab + pathS[i].DirPath + tab + dots(pathS[i].Recurse))
 			}
 			fmt.Println()
 		}
