@@ -29,7 +29,7 @@ func (d DirS) Close() error {
 	return nil
 }
 
-func (d DirS) Walker(quit func() bool, out ...Actor) func() {
+func (d DirS) Walker(quit func() bool, out ...*Actor) func() {
 
 	return func() {
 

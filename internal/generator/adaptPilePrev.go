@@ -14,27 +14,29 @@ type prevPile struct {
 }
 
 // NewPrev returns a new dictionary
-func NewPrev(size, buff int) nextPile {
-	return nextPile{gen.MakeStringPile(size, buff)}
+func NewPrev(size, buff int) prevPile {
+	return prevPile{gen.MakeStringPile(size, buff)}
 }
 
 func (p prevPile) S() []string {
 	return <-p.Done()
 }
 
-func (p prevPile) Walker(quit func() bool, out ...Actor) func() {
+func (p prevPile) Walker(quit func() bool, out ...*Actor) func() {
 
 	return func() {
 
 		defer ActorsClose(out...)
-		for item, ok := p.Iter(); ok && !quit(); item, ok = p.Next() { // TODO must reverse!
-			ActorsDo(item, out...)
+		itemS := <-p.Done()
+		count := len(itemS)
+		for i := count - 1; i >= 0 && !quit(); i-- {
+			ActorsDo(itemS[i], out...)
 		}
 	}
 }
 
-func (p prevPile) Action(is ...itemIs) Actor {
-	return Actor{p, func(item string) {
+func (p prevPile) Action(is ...itemIs) *Actor {
+	actor := Actor{p, func(item string) {
 		for i := range is {
 			if is[i](item) {
 				p.Pile(item)
@@ -42,4 +44,5 @@ func (p prevPile) Action(is ...itemIs) Actor {
 			}
 		}
 	}}
+	return &actor
 }

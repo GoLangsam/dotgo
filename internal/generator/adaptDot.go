@@ -55,7 +55,7 @@ func flagPrintErrors(data *dot.Dot, prefix string) bool {
 	}
 }
 
-// HaveErrors returns the subnode with errors nad true, iff any - or nil, false
+// HaveErrors returns the subnode with errors and true, iff any - or nil, false
 func HaveErrors(d *dot.Dot) (*dot.Dot, bool) {
 	_, ok := d.Fetch(ErrorID)
 	switch {

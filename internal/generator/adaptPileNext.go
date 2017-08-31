@@ -22,7 +22,7 @@ func (p nextPile) S() []string {
 	return <-p.Done()
 }
 
-func (p nextPile) Walker(quit func() bool, out ...Actor) func() {
+func (p nextPile) Walker(quit func() bool, out ...*Actor) func() {
 
 	return func() {
 
@@ -33,8 +33,8 @@ func (p nextPile) Walker(quit func() bool, out ...Actor) func() {
 	}
 }
 
-func (p nextPile) Action(is ...itemIs) Actor {
-	return Actor{p, func(item string) {
+func (p nextPile) Action(is ...itemIs) *Actor {
+	actor := Actor{p, func(item string) {
 		for i := range is {
 			if is[i](item) {
 				p.Pile(item)
@@ -42,4 +42,5 @@ func (p nextPile) Action(is ...itemIs) Actor {
 			}
 		}
 	}}
+	return &actor
 }

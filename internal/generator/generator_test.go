@@ -9,7 +9,7 @@ import (
 )
 
 // Do all adapted collections implement Some?
-var _ Some = Actor{}
+var _ Some = new(Actor)
 
 // var _ Some = NewData(aDot) // missing: Add Walker
 var _ Some = NewDict()

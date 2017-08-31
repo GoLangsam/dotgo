@@ -7,26 +7,26 @@ package gen
 func (template Template) tmplParser(
 	data Dot,
 	get func(string) string,
-) Actor {
-	return Actor{template, func(item string) {
+) *Actor {
+	actor := Actor{template, func(item string) {
 
 		var err error
 		text := get(item)
 		name := nameLessExt(item)
+
 		_, err = template.nameParse(name, text)
 		data.SeeError("CollectTmpl: Parse:", name, err)
 	}}
+	return &actor
 }
 
 func (template Template) metaParser(
 	data Dot,
 	get func(string) string,
-) Actor {
-	return Actor{template, func(item string) {
+) *Actor {
+	actor := Actor{template, func(item string) {
 
 		var err error
-		println("MetaParse: " + item)
-
 		text := get(item)
 		name := nameLessExt(item) + ".meta"
 
@@ -39,6 +39,7 @@ func (template Template) metaParser(
 		_, err = Apply(data, tmpl, name)
 		data.SeeError("CollectMeta: Apply:", name, err)
 	}}
+	return &actor
 }
 
 // nameParse is slightly similar to ParseFiles

@@ -29,7 +29,7 @@ func (template Template) Close() error {
 	return nil
 }
 
-func (template Template) Walker(quit func() bool, out ...Actor) func() {
+func (template Template) Walker(quit func() bool, out ...*Actor) func() {
 
 	return func() {
 

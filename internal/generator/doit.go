@@ -56,7 +56,7 @@ func DoIt() error {
 	doit := doIt(rootData)                                         // carries context, and data
 
 	// doer - just do something
-	doer := func(do func()) Actor { return Actor{NewNull(), func(string) { do() }} }
+	doer := func(do func()) *Actor { a := Actor{NewNull(), func(string) { do() }}; return &a }
 
 	// some Null Actors - for flagDot dotter  // ...
 	flagWalk := doer(func() { flagDot(a_, dotWalk) })
@@ -108,10 +108,10 @@ func DoIt() error {
 
 func (doit *toDo) exec(
 	execS DirS,
-	tmplfile Actor,
-	executes Actor,
-	metadata Actor,
-	writeout Actor,
+	tmplfile *Actor,
+	executes *Actor,
+	metadata *Actor,
+	writeout *Actor,
 	lookupData func(string) string,
 ) error {
 

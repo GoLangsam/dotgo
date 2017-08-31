@@ -23,7 +23,7 @@ func (d Dict) Close() error {
 	return nil
 }
 
-func (d Dict) Walker(quit func() bool, out ...Actor) func() {
+func (d Dict) Walker(quit func() bool, out ...*Actor) func() {
 
 	return func() {
 
@@ -37,8 +37,8 @@ func (d Dict) Walker(quit func() bool, out ...Actor) func() {
 	}
 }
 
-func (d Dict) Action(is ...itemIs) Actor {
-	return Actor{d, func(item string) {
+func (d Dict) Action(is ...itemIs) *Actor {
+	actor := Actor{d, func(item string) {
 		for i := range is {
 			if is[i](item) {
 				d.Assign(nameLessExt(item), nil)
@@ -46,4 +46,5 @@ func (d Dict) Action(is ...itemIs) Actor {
 			}
 		}
 	}}
+	return &actor
 }
