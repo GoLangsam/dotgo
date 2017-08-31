@@ -173,10 +173,16 @@ func (data Dot) flagPrint(flag bool, header string) {
 }
 */
 // ifPrintTemplate prints the template, iff flag is true
-func (t *toDo) ifPrintTemplate(flag bool, header string) {
+func (t *toDo) ifPrintTemplate(flag, verbose bool, header string) {
 	if flag && t.ok() {
-		flagPrintTemplate(true, t.tmpl, header)
-		if true {
+		nameS := t.tmpl.S()
+		count := len(nameS)
+		fmt.Println(header+tab+cnt, count, tab)
+
+		if verbose {
+			for i := range nameS {
+				fmt.Println(tab + nameS[i] + tab)
+			}
 			fmt.Println()
 		}
 	}

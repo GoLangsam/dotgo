@@ -63,7 +63,7 @@ func DoIt() error {
 		meta, err := Meta(lookupData(item))
 		if err == nil && meta != "" {
 			metaPile.Add(item)
-			println("\nsFound Meta " + item)
+			println("\nFound Meta " + item)
 		} else if err != nil {
 			panic(err)
 		}
@@ -120,11 +120,11 @@ func DoIt() error {
 		tempPile = NewNext(0, 0)                    // forget
 		tempMake = Actor{tempPile, func(string) {}} // forget
 
-		doit.ifPrintTemplate(at, "Main:")
+		doit.ifPrintTemplate(at, atv, "Main:")
 		doit.ifPrintDataTree(ad, aDot)
 		filePile.flagPrint(af, afv, "File:")
-		metaPile.flagPrint(af, afv, "Meta:")
-		baseDict.flagPrint(af, afv, "Base:")
+		metaPile.flagPrint(am, amv, "Meta:")
+		baseDict.flagPrint(an, anv, "Base:")
 
 		doit.data = NewData(aDot) // forget
 		flagClose(a_, analyse)

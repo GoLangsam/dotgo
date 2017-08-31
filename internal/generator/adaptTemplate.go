@@ -14,10 +14,6 @@ type Template struct {
 	t.Template
 }
 
-func flagPrintTemplate(flag bool, tmpl Template, prefix string) {
-	t.IfPrintTemplate(flag, tmpl, prefix)
-}
-
 // NewTemplate returns a new template
 // with funcmap attached and delimiters set
 func NewTemplate(name string) Template {
