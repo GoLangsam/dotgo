@@ -7,7 +7,6 @@ package template
 // see also "do/dot/funcs"
 
 import (
-	"html/template"
 	"os"
 	"runtime"
 )
@@ -61,8 +60,8 @@ func memstats() interface{} {
 	return *stats
 }
 
-// Funcs contains the FuncMap providied and used by this package
-var Funcs = template.FuncMap{
+// Funcs contains the template.FuncMap providied and used by this package
+var Funcs = map[string]interface{}{
 	"null":     null,     // returns an empty string - useful to pipe method-results away
 	"memstats": memstats, // runtime.MemStats - refreshed on each call
 	"cmdline":  cmdline,  // os.Args
