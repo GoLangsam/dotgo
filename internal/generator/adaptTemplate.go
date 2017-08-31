@@ -20,11 +20,6 @@ func NewTemplate(name string) Template {
 	return Template{t.New(name).Funcs(Funcs)}
 }
 
-// Meta returns the meta-text extraced from text
-func Meta(text string) (string, error) {
-	return t.Meta(text)
-}
-
 func (template Template) S() []string {
 	return t.Names(template)
 }
@@ -32,4 +27,24 @@ func (template Template) S() []string {
 // Close - pretend to be a Closer (<=> an io.Closer)
 func (template Template) Close() error {
 	return nil
+}
+
+// Meta returns the meta-text extraced from text
+func Meta(text string) (string, error) {
+	return t.Meta(text)
+}
+
+// nameParse is slightly similar to ParseFiles
+func nameParse(template Template, name, body string) (Template, error) {
+
+	var err error
+	var tmpl Template
+	if name == template.Name() {
+		tmpl = template
+	} else {
+		tmpl = Template{template.New(name)}
+	}
+
+	_, err = tmpl.Parse(body) // Parse the data
+	return tmpl, err
 }

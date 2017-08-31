@@ -4,20 +4,6 @@
 
 package gen
 
-func nameParse(template Template, name, body string) (Template, error) {
-
-	var err error
-	var tmpl Template
-	if name == template.Name() {
-		tmpl = template
-	} else {
-		tmpl = Template{template.New(name)}
-	}
-
-	_, err = tmpl.Parse(body) // Parse the data
-	return tmpl, err
-}
-
 func tmplParser(
 	t *toDo,
 	get func(string) string,
