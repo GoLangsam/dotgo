@@ -174,10 +174,14 @@ func (data Dot) flagPrint(flag bool, header string) {
 */
 
 // ifPrintDataTree prints the data tree, iff flag is true
-func (t *toDo) ifPrintDataTree(flag bool, header string) {
+func (t *toDo) ifPrintDataTree(flag, verbose bool, header string) {
 	if flag {
-		flagPrintDataTree(true, t.data, header)
-		if true {
+		itemS := t.data.S()
+		count := len(itemS)
+		fmt.Println(header+tab+cnt, count, tab)
+
+		if verbose {
+			flagPrintDataTree(verbose, t.data, header)
 			fmt.Println()
 		}
 	}
