@@ -155,15 +155,23 @@ func (p prevPile) flagPrint(flag, verbose bool, header string) {
 	}
 }
 
-/*
 // flagPrint prints the template, iff flag is true
-func (tmpl Template) flagPrint(flag bool, header string) {
+func (tmpl Template) flagPrint(flag, verbose bool, header string) {
 	if flag {
-		flagPrintTemplate(true, tmpl, header)
-		fmt.Println()
+		itemS := tmpl.S()
+		count := len(itemS)
+		fmt.Println(header+tab+cnt, count, tab)
+
+		if verbose {
+			for i := range itemS {
+				fmt.Println(tab + itemS[i] + tab)
+			}
+			fmt.Println()
+		}
 	}
 }
 
+/*
 // flagPrint  prints the data tree, iff flag is true
 func (data Dot) flagPrint(flag bool, header string) {
 	if flag {
@@ -172,21 +180,6 @@ func (data Dot) flagPrint(flag bool, header string) {
 	}
 }
 */
-// ifPrintTemplate prints the template, iff flag is true
-func (t *toDo) ifPrintTemplate(flag, verbose bool, header string) {
-	if flag && t.ok() {
-		nameS := t.tmpl.S()
-		count := len(nameS)
-		fmt.Println(header+tab+cnt, count, tab)
-
-		if verbose {
-			for i := range nameS {
-				fmt.Println(tab + nameS[i] + tab)
-			}
-			fmt.Println()
-		}
-	}
-}
 
 // ifPrintDataTree prints the data tree, iff flag is true
 func (t *toDo) ifPrintDataTree(flag bool, header string) {

@@ -29,6 +29,20 @@ func (template Template) Close() error {
 	return nil
 }
 
+func (template Template) Walker(t *toDo, out ...Actor) func() {
+
+	return func() {
+
+		defer ActorsClose(out...)
+		for _, item := range template.S() {
+			if !t.ok() {
+				return // bail out
+			}
+			ActorsDo(item, out...)
+		}
+	}
+}
+
 // Meta returns the meta-text extraced from text
 func Meta(text string) (string, error) {
 	return t.Meta(text)

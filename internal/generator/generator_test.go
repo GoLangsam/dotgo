@@ -8,13 +8,12 @@ import (
 	_ "fmt"
 )
 
-// Do all adapted collections implement Item?
+// Do all adapted collections implement Some?
 var _ Some = Actor{}
 
-// var _ Item = NewData(aDot) // missing: Add Walker
+// var _ Some = NewData(aDot) // missing: Add Walker
 var _ Some = NewDict()
 var _ Some = NewNull()
 var _ Some = NewNext(0, 0)
 var _ Some = NewPrev(0, 0)
-
-// var _ Item = NewTemplate(aDot) // missing: Add Walker
+var _ Some = NewTemplate(aDot) // missing: Add Walker

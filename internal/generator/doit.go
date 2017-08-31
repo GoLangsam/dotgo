@@ -119,7 +119,7 @@ func DoIt() error {
 		tempPile = NewNext(0, 0)                    // forget
 		tempMake = Actor{tempPile, func(string) {}} // forget
 
-		doit.ifPrintTemplate(at, atv, "Main:")
+		doit.tmpl.flagPrint(at, atv, "Main:")
 		doit.ifPrintDataTree(ad, aDot)
 		filePile.flagPrint(af, afv, "File:")
 		metaPile.flagPrint(am, amv, "Meta:")
