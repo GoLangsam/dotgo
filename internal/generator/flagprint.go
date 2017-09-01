@@ -32,7 +32,7 @@ func dots(flag bool) string {
 func flagOpen(flag bool, prefix string) time.Time {
 	runtime.GC()
 	if flag {
-		fmt.Print(prefix + tab + arr + tab)
+		fmt.Print(prefix, tab, arr, tab)
 	}
 	return time.Now()
 }
@@ -48,7 +48,7 @@ func flagDot(flag bool, char string) {
 func flagClose(flag bool, start time.Time) {
 	if flag {
 		dur := time.Since(start)
-		fmt.Println(tab+arr+don+tab, dur, tab)
+		fmt.Println(tab, arr, don, tab, dur, tab)
 	}
 	runtime.GC()
 }
@@ -56,9 +56,9 @@ func flagClose(flag bool, start time.Time) {
 // flagPrintByteS prints the byteS (as string), iff flag is true
 func flagPrintByteS(flag bool, byteS []byte, header string) {
 	if flag {
-		fmt.Println(header+tab+cnt, len(byteS), tab)
+		fmt.Println(header, tab, cnt, len(byteS), tab)
 
-		fmt.Println(tab + string(byteS) + tab)
+		fmt.Println(tab, string(byteS), tab)
 
 		fmt.Println()
 	}
@@ -67,7 +67,7 @@ func flagPrintByteS(flag bool, byteS []byte, header string) {
 // flagPrintString prints prefix & suffix, iff flag is true
 func flagPrintString(flag bool, prefix string, suffix string) {
 	if flag {
-		fmt.Println(prefix+tab+arr, suffix+tab)
+		fmt.Println(prefix, tab, arr, suffix, tab)
 	}
 }
 
@@ -79,7 +79,7 @@ func (m Actor) flagPrint(flag, verbose bool, header string) {
 // flagPrint prints the dictionary, iff flag is true
 func (d Dict) flagPrint(flag, verbose bool, header string) {
 	if flag {
-		fmt.Println(header+tab+cnt, d.Len(), tab, tab)
+		fmt.Println(header, tab, cnt, d.Len(), tab, tab)
 
 		if verbose {
 			for _, s := range d.S() {
@@ -94,7 +94,7 @@ func (d Dict) flagPrint(flag, verbose bool, header string) {
 // flagPrint prints the path names, iff flag is true
 func (d DirS) flagPrint(flag, verbose bool, header string) {
 	if flag {
-		fmt.Println(header+tab+cnt, len(d), tab, tab)
+		fmt.Println(header, tab, cnt, len(d), tab, tab)
 
 		if verbose {
 			for i := range d {
@@ -108,7 +108,7 @@ func (d DirS) flagPrint(flag, verbose bool, header string) {
 // flagPrint prints nothing but header, iff flag is true
 func (n Null) flagPrint(flag, verbose bool, header string) {
 	if flag {
-		fmt.Println(header + tab)
+		fmt.Println(header, tab)
 		if verbose {
 			fmt.Println()
 		}
@@ -120,11 +120,11 @@ func (p nextPile) flagPrint(flag, verbose bool, header string) {
 	if flag {
 		itemS := <-p.Done()
 		count := len(itemS)
-		fmt.Println(header+tab+cnt, count, tab)
+		fmt.Println(header, tab, cnt, count, tab)
 
 		if verbose {
 			for i := range itemS {
-				fmt.Println(tab + itemS[i] + tab)
+				fmt.Println(tab, itemS[i], tab)
 			}
 			fmt.Println()
 		}
@@ -136,11 +136,11 @@ func (p prevPile) flagPrint(flag, verbose bool, header string) {
 	if flag {
 		itemS := <-p.Done()
 		count := len(itemS)
-		fmt.Println(header+tab+cnt, count, tab)
+		fmt.Println(header, tab, cnt, count, tab)
 
 		if verbose {
 			for i := count - 1; i >= 0; i-- {
-				fmt.Println(tab + itemS[i] + tab)
+				fmt.Println(tab, itemS[i], tab)
 			}
 			fmt.Println()
 		}
@@ -152,11 +152,11 @@ func (tmpl Template) flagPrint(flag, verbose bool, header string) {
 	if flag {
 		itemS := tmpl.S()
 		count := len(itemS)
-		fmt.Println(header+tab+cnt, count, tab)
+		fmt.Println(header, tab, cnt, count, tab)
 
 		if verbose {
 			for i := range itemS {
-				fmt.Println(tab + itemS[i] + tab)
+				fmt.Println(tab, itemS[i], tab)
 			}
 			fmt.Println()
 		}
@@ -178,7 +178,7 @@ func (t *toDo) ifPrintDataTree(flag, verbose bool, header string) {
 	if flag {
 		itemS := t.data.S()
 		count := len(itemS)
-		fmt.Println(header+tab+cnt, count, tab)
+		fmt.Println(header, tab, cnt, count, tab)
 
 		if verbose {
 			flagPrintDataTree(verbose, t.data, header)
