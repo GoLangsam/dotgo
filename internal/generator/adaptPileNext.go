@@ -23,15 +23,23 @@ func NewNext(size, buff int) nextPile {
 // Beg implement Some
 
 // S -
-// wait for Done
+// wait for Done, and return content of pile
 func (p nextPile) S() []string {
 	return <-p.Done()
 }
 
+// Len -
+// wait for Done, and return size of pile
 func (p nextPile) Len() int {
 	return len(<-p.Done())
 }
 
+// Close -
+// inherited
+
+// Walker -
+// traverse the pile forward
+// Note: may be used in parallel to p being populated, e.g. as some out *Actor
 func (p nextPile) Walker(quit func() bool, out ...*Actor) func() {
 
 	return func() {
@@ -43,7 +51,9 @@ func (p nextPile) Walker(quit func() bool, out ...*Actor) func() {
 	}
 }
 
-// flagPrint prints the pile, iff flag is true
+// flagPrint prints
+// the pile,
+// iff flag is true
 func (p nextPile) flagPrint(flag, verbose bool, header string) {
 	if flag {
 		fmt.Println(header, tab, cnt, p.Len(), tab, tab)

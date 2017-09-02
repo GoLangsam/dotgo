@@ -30,14 +30,24 @@ func (d DirS) S() []string {
 	return s
 }
 
+// Len -
+// how many directories
 func (d DirS) Len() int {
 	return len(d)
 }
 
+// Close -
+// pretend to be a Closer (<=> an io.Closer)
 func (d DirS) Close() error {
 	return nil
 }
 
+// Walker -
+// traverse each DirPath
+// apply ActorsDo to each file,
+// and descend into its sub-directories
+// iff d[i].Recurse
+// Note: uses filepath.Walk
 func (d DirS) Walker(quit func() bool, out ...*Actor) func() {
 
 	return func() {

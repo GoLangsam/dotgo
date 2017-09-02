@@ -22,19 +22,28 @@ func NewTemplate(name string) Template {
 	return Template{t.New(name).Funcs(Funcs)}
 }
 
+// Beg implement Some
+
+// S -
+// return all Names
 func (template Template) S() []string {
 	return t.Names(template)
 }
 
+// Len -
+// how many Names
 func (template Template) Len() int {
 	return len(template.S())
 }
 
-// Close - pretend to be a Closer (<=> an io.Closer)
+// Close -
+// pretend to be a Closer (<=> an io.Closer)
 func (template Template) Close() error {
 	return nil
 }
 
+// Walker -
+// traverse S() - the NameS
 func (template Template) Walker(quit func() bool, out ...*Actor) func() {
 
 	return func() {
@@ -61,6 +70,8 @@ func (tmpl Template) flagPrint(flag, verbose bool, header string) {
 		}
 	}
 }
+
+// End implement Some
 
 // Meta returns the meta-text extraced from text
 func Meta(text string) (string, error) {

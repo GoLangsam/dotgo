@@ -23,10 +23,14 @@ func (m Actor) Len() int {
 	return m.it.Len()
 }
 
+// Close -
+// delegate to it
 func (m Actor) Close() error {
 	return m.it.Close()
 }
 
+// Walker -
+// delegate to it
 func (m Actor) Walker(quit func() bool, out ...*Actor) func() {
 	return m.it.Walker(quit, out...)
 }

@@ -28,11 +28,14 @@ func NewDict() Dict {
 // Len -
 // inherited
 
-// Close - pretend to be a Closer (<=> an io.Closer)
+// Close -
+// pretend to be a Closer (<=> an io.Closer)
 func (d Dict) Close() error {
 	return nil
 }
 
+// Walker -
+// traverse the (sorted) keys of the dictionary
 func (d Dict) Walker(quit func() bool, out ...*Actor) func() {
 
 	return func() {
@@ -47,7 +50,9 @@ func (d Dict) Walker(quit func() bool, out ...*Actor) func() {
 	}
 }
 
-// flagPrint prints the dictionary, iff flag is true
+// flagPrint prints
+// the dictionary,
+// iff flag is true
 func (d Dict) flagPrint(flag, verbose bool, header string) {
 	if flag {
 		fmt.Println(header, tab, cnt, d.Len(), tab, tab)

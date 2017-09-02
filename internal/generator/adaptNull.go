@@ -28,10 +28,14 @@ func (n Null) Len() int {
 	return 0
 }
 
+// Close -
+// pretend to be a Closer (<=> an io.Closer)
 func (n Null) Close() error {
 	return nil
 }
 
+// Walker -
+// pretend to walk the empty content :-)
 func (n Null) Walker(quit func() bool, out ...*Actor) func() {
 	return func() { return }
 }

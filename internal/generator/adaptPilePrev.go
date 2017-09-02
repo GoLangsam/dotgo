@@ -23,15 +23,23 @@ func NewPrev(size, buff int) prevPile {
 // Beg implement Some
 
 // S -
-// wait for Done
+// wait for Done, and return content of pile
+// Note: content is *not* reversed!
 func (p prevPile) S() []string {
 	return <-p.Done()
 }
 
+// Len -
+// wait for Done, and return size of pile
 func (p prevPile) Len() int {
 	return len(<-p.Done())
 }
 
+// Close -
+// inherited
+
+// Walker -
+// traverse the pile - backward
 func (p prevPile) Walker(quit func() bool, out ...*Actor) func() {
 
 	return func() {
@@ -45,7 +53,9 @@ func (p prevPile) Walker(quit func() bool, out ...*Actor) func() {
 	}
 }
 
-// flagPrint prints the pile, iff flag is true
+// flagPrint prints
+// the pile (in reverse order),
+// iff flag is true
 func (p prevPile) flagPrint(flag, verbose bool, header string) {
 	if flag {
 		fmt.Println(header, tab, cnt, p.Len(), tab, tab)
