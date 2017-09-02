@@ -37,3 +37,8 @@ func (t *toDo) do(do func()) {
 		do()
 	}(t, do)
 }
+
+// ifPrintErrors prints the error(s), iff any
+func (t *toDo) ifPrintErrors(header string) bool {
+	return flagPrintErrors(t.data, header)
+}

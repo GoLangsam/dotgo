@@ -70,8 +70,3 @@ func flagPrintString(flag bool, prefix string, suffix string) {
 		fmt.Println(prefix, tab, arr, suffix, tab, tab)
 	}
 }
-
-// ifPrintErrors prints the error(s), iff any
-func (t *toDo) ifPrintErrors(header string) bool {
-	return flagPrintErrors(t.data, header)
-}
