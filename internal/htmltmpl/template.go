@@ -31,7 +31,7 @@ type Template interface {
 	ExecuteTemplate(wr io.Writer, name string, data interface{}) error
 }
 
-// New returns a new template with funcmap attached and delimiters set
+// New returns a new template with delimiters set
 func New(name string) *template.Template {
 	return template.New(name).Delims(tmplL, tmplR)
 }
