@@ -25,6 +25,11 @@ func (m Actor) Walker(quit func() bool, out ...*Actor) func() {
 	return m.it.Walker(quit, out...)
 }
 
+// flagPrint delegates to it
+func (m Actor) flagPrint(flag, verbose bool, header string) {
+	m.it.flagPrint(flag, verbose, header)
+}
+
 func ActorsClose(out ...*Actor) {
 	for i := range out {
 		out[i].it.Close()

@@ -35,6 +35,28 @@ func NewData(name string) *dot.Dot {
 	return dot.New(name)
 }
 
+/*
+// flagPrint  prints the data tree, iff flag is true
+func (data Dot) flagPrint(flag bool, header string) {
+	if flag {
+		flagPrintDataTree(true, data, header)
+		fmt.Println()
+	}
+}
+*/
+
+// ifPrintDataTree prints the data tree, iff flag is true
+func (t *toDo) ifPrintDataTree(flag, verbose bool, header string) {
+	if flag {
+		fmt.Println(header, tab, cnt, len(t.data.S()), tab, tab)
+
+		if verbose {
+			flagPrintDataTree(verbose, t.data, header)
+			fmt.Println(tab, tab, tab)
+		}
+	}
+}
+
 // flagPrintDataTree prints the data tree, iff flag is true
 func flagPrintDataTree(flag bool, data Dot, prefix string) {
 	if flag {

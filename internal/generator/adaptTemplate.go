@@ -5,6 +5,8 @@
 package gen
 
 import (
+	"fmt"
+
 	t "github.com/golangsam/dotgo/internal/texttmpl" // adapter to "text/template"
 	//"github.com/golangsam/dotgo/internal/htmltmpl" // adapter to "html/template"
 )
@@ -43,6 +45,19 @@ func (template Template) Walker(quit func() bool, out ...*Actor) func() {
 				return // bail out
 			}
 			ActorsDo(item, out...)
+		}
+	}
+}
+
+// flagPrint prints the template, iff flag is true
+func (tmpl Template) flagPrint(flag, verbose bool, header string) {
+	if flag {
+		fmt.Println(header, tab, cnt, tmpl.Len(), tab, tab)
+
+		if verbose {
+			do := func(item string) { fmt.Println(tab, item, tab, tab) }
+			tmpl.Walker(noquit, doit(do))()
+			fmt.Println(tab, tab, tab)
 		}
 	}
 }

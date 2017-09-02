@@ -5,6 +5,8 @@
 package gen
 
 import (
+	"fmt"
+
 	"github.com/golangsam/container/ccsafe/lsm"
 )
 
@@ -33,6 +35,19 @@ func (d Dict) Walker(quit func() bool, out ...*Actor) func() {
 				return // bail out
 			}
 			ActorsDo(item, out...)
+		}
+	}
+}
+
+// flagPrint prints the dictionary, iff flag is true
+func (d Dict) flagPrint(flag, verbose bool, header string) {
+	if flag {
+		fmt.Println(header, tab, cnt, d.Len(), tab, tab)
+
+		if verbose {
+			do := func(item string) { flagPrintString(flag, arr, item) }
+			d.Walker(noquit, doit(do))()
+			fmt.Println(tab, tab, tab)
 		}
 	}
 }

@@ -5,6 +5,7 @@
 package gen
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -46,6 +47,20 @@ func (d DirS) Walker(quit func() bool, out ...*Actor) func() {
 		for i := 0; i < len(d) && !quit(); i++ {
 			dh := ifFlagSkipDirWf(matchBool(d[i].Recurse))     // Recurse?
 			filepath.Walk(d[i].DirPath, isDirWf(quit, dh, fh)) // Walk path
+		}
+	}
+}
+
+// flagPrint prints the path names, iff flag is true
+func (d DirS) flagPrint(flag, verbose bool, header string) {
+	if flag {
+		fmt.Println(header, tab, cnt, len(d), tab, tab)
+
+		if verbose {
+			for i := range d {
+				flagPrintString(flag, d[i].DirPath, dots(d[i].Recurse))
+			}
+			fmt.Println(tab, tab, tab)
 		}
 	}
 }

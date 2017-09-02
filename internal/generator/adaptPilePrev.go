@@ -5,6 +5,8 @@
 package gen
 
 import (
+	"fmt"
+
 	"github.com/golangsam/dotgo/internal/pile"
 )
 
@@ -35,6 +37,19 @@ func (p prevPile) Walker(quit func() bool, out ...*Actor) func() {
 		count := len(itemS)
 		for i := count - 1; i >= 0 && !quit(); i-- {
 			ActorsDo(itemS[i], out...)
+		}
+	}
+}
+
+// flagPrint prints the pile, iff flag is true
+func (p prevPile) flagPrint(flag, verbose bool, header string) {
+	if flag {
+		fmt.Println(header, tab, cnt, p.Len(), tab, tab)
+
+		if verbose {
+			do := func(item string) { fmt.Println(tab, item, tab, tab) }
+			p.Walker(noquit, doit(do))()
+			fmt.Println(tab, tab, tab)
 		}
 	}
 }

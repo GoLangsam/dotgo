@@ -4,6 +4,10 @@
 
 package gen
 
+import (
+	"fmt"
+)
+
 type Null struct{}
 
 func NewNull() Null {
@@ -24,4 +28,14 @@ func (n Null) Close() error {
 
 func (n Null) Walker(quit func() bool, out ...*Actor) func() {
 	return func() { return }
+}
+
+// flagPrint prints nothing but header, iff flag is true
+func (n Null) flagPrint(flag, verbose bool, header string) {
+	if flag {
+		fmt.Println(header, tab, cnt, n.Len(), tab, tab)
+		if verbose {
+			fmt.Println(tab, tab, tab)
+		}
+	}
 }

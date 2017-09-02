@@ -5,6 +5,8 @@
 package gen
 
 import (
+	"fmt"
+
 	"github.com/golangsam/dotgo/internal/pile"
 )
 
@@ -33,6 +35,19 @@ func (p nextPile) Walker(quit func() bool, out ...*Actor) func() {
 		defer ActorsClose(out...)
 		for item, ok := p.Iter(); ok && !quit(); item, ok = p.Next() {
 			ActorsDo(item, out...)
+		}
+	}
+}
+
+// flagPrint prints the pile, iff flag is true
+func (p nextPile) flagPrint(flag, verbose bool, header string) {
+	if flag {
+		fmt.Println(header, tab, cnt, p.Len(), tab, tab)
+
+		if verbose {
+			do := func(item string) { fmt.Println(tab, item, tab, tab) }
+			p.Walker(noquit, doit(do))()
+			fmt.Println(tab, tab, tab)
 		}
 	}
 }
