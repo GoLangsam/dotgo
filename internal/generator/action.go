@@ -4,6 +4,12 @@
 
 package gen
 
+// doer - just do something
+func doer(do func()) *Actor       { a := Actor{NewNull(), func(item string) { do() }}; return &a }
+func doit(do func(string)) *Actor { a := Actor{NewNull(), func(item string) { do(item) }}; return &a }
+
+var noquit = func() bool { return false }
+
 func (template Template) tmplParser(
 	data Dot,
 	get func(string) string,

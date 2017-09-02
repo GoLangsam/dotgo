@@ -56,18 +56,18 @@ func flagClose(flag bool, start time.Time) {
 // flagPrintByteS prints the byteS (as string), iff flag is true
 func flagPrintByteS(flag bool, byteS []byte, header string) {
 	if flag {
-		fmt.Println(header, tab, cnt, len(byteS), tab)
+		fmt.Println(header, tab, cnt, len(byteS), tab, tab)
 
-		fmt.Println(tab, string(byteS), tab)
+		fmt.Println(tab, string(byteS), tab, tab)
 
-		fmt.Println()
+		fmt.Println(tab, tab, tab)
 	}
 }
 
 // flagPrintString prints prefix & suffix, iff flag is true
 func flagPrintString(flag bool, prefix string, suffix string) {
 	if flag {
-		fmt.Println(prefix, tab, arr, suffix, tab)
+		fmt.Println(prefix, tab, arr, suffix, tab, tab)
 	}
 }
 
@@ -82,11 +82,9 @@ func (d Dict) flagPrint(flag, verbose bool, header string) {
 		fmt.Println(header, tab, cnt, d.Len(), tab, tab)
 
 		if verbose {
-			for _, s := range d.S() {
-				flagPrintString(flag, "", s)
-			}
-			fmt.Println()
-
+			do := func(item string) { flagPrintString(flag, "", item) }
+			d.Walker(noquit, doit(do))()
+			fmt.Println(tab, tab, tab)
 		}
 	}
 }
@@ -98,9 +96,9 @@ func (d DirS) flagPrint(flag, verbose bool, header string) {
 
 		if verbose {
 			for i := range d {
-				flagPrintString(flag, tab+d[i].DirPath, dots(d[i].Recurse))
+				flagPrintString(flag, d[i].DirPath, dots(d[i].Recurse))
 			}
-			fmt.Println()
+			fmt.Println(tab, tab, tab)
 		}
 	}
 }
@@ -108,9 +106,9 @@ func (d DirS) flagPrint(flag, verbose bool, header string) {
 // flagPrint prints nothing but header, iff flag is true
 func (n Null) flagPrint(flag, verbose bool, header string) {
 	if flag {
-		fmt.Println(header, tab)
+		fmt.Println(header, tab, cnt, n.Len(), tab, tab)
 		if verbose {
-			fmt.Println()
+			fmt.Println(tab, tab, tab)
 		}
 	}
 }
@@ -118,15 +116,12 @@ func (n Null) flagPrint(flag, verbose bool, header string) {
 // flagPrint prints the pile, iff flag is true
 func (p nextPile) flagPrint(flag, verbose bool, header string) {
 	if flag {
-		itemS := <-p.Done()
-		count := len(itemS)
-		fmt.Println(header, tab, cnt, count, tab)
+		fmt.Println(header, tab, cnt, p.Len(), tab, tab)
 
 		if verbose {
-			for i := range itemS {
-				fmt.Println(tab, itemS[i], tab)
-			}
-			fmt.Println()
+			do := func(item string) { fmt.Println(tab, item, tab, tab) }
+			p.Walker(noquit, doit(do))()
+			fmt.Println(tab, tab, tab)
 		}
 	}
 }
@@ -134,15 +129,12 @@ func (p nextPile) flagPrint(flag, verbose bool, header string) {
 // flagPrint prints the pile, iff flag is true
 func (p prevPile) flagPrint(flag, verbose bool, header string) {
 	if flag {
-		itemS := <-p.Done()
-		count := len(itemS)
-		fmt.Println(header, tab, cnt, count, tab)
+		fmt.Println(header, tab, cnt, p.Len(), tab, tab)
 
 		if verbose {
-			for i := count - 1; i >= 0; i-- {
-				fmt.Println(tab, itemS[i], tab)
-			}
-			fmt.Println()
+			do := func(item string) { fmt.Println(tab, item, tab, tab) }
+			p.Walker(noquit, doit(do))()
+			fmt.Println(tab, tab, tab)
 		}
 	}
 }
@@ -150,15 +142,12 @@ func (p prevPile) flagPrint(flag, verbose bool, header string) {
 // flagPrint prints the template, iff flag is true
 func (tmpl Template) flagPrint(flag, verbose bool, header string) {
 	if flag {
-		itemS := tmpl.S()
-		count := len(itemS)
-		fmt.Println(header, tab, cnt, count, tab)
+		fmt.Println(header, tab, cnt, tmpl.Len(), tab, tab)
 
 		if verbose {
-			for i := range itemS {
-				fmt.Println(tab, itemS[i], tab)
-			}
-			fmt.Println()
+			do := func(item string) { fmt.Println(tab, item, tab, tab) }
+			tmpl.Walker(noquit, doit(do))()
+			fmt.Println(tab, tab, tab)
 		}
 	}
 }
@@ -178,7 +167,7 @@ func (t *toDo) ifPrintDataTree(flag, verbose bool, header string) {
 	if flag {
 		itemS := t.data.S()
 		count := len(itemS)
-		fmt.Println(header, tab, cnt, count, tab)
+		fmt.Println(header, tab, cnt, count, tab, tab)
 
 		if verbose {
 			flagPrintDataTree(verbose, t.data, header)

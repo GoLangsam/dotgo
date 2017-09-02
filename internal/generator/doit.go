@@ -45,9 +45,6 @@ func DoIt() error {
 	}
 	_ = isTrue
 
-	// doer - just do something
-	doer := func(do func()) *Actor { a := Actor{NewNull(), func(string) { do() }}; return &a }
-
 	// some Null Actors - for flagDot dotter  // ...
 	flagPrep := doer(func() { flagDot(a_, ".") })
 	flagTemp := doer(func() { flagDot(a_, "-") })
