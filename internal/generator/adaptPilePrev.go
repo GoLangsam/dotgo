@@ -22,6 +22,10 @@ func (p prevPile) S() []string {
 	return <-p.Done()
 }
 
+func (p prevPile) Len() int {
+	return len(<-p.Done())
+}
+
 func (p prevPile) Walker(quit func() bool, out ...*Actor) func() {
 
 	return func() {

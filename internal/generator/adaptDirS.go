@@ -25,6 +25,10 @@ func (d DirS) S() []string {
 	return s
 }
 
+func (d DirS) Len() int {
+	return len(d)
+}
+
 func (d DirS) Close() error {
 	return nil
 }

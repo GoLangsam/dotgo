@@ -7,9 +7,10 @@ package gen
 // Some represents our walkable collections which may contain some strings
 type Some interface {
 	S() []string                                   // content as stringS
-	Walker(quit func() bool, out ...*Actor) func() // provide traversal - interruptable
+	Len() int                                      // length / count of content
+	Walker(quit func() bool, out ...*Actor) func() // provide traversal thru items - interruptable
 	Close() error                                  // mimic io.Closer - definded locally in order to avoid explicit dependency
-	flagPrint(flag, verbose bool, header string)
+	flagPrint(flag, verbose bool, header string)   // conditional print
 }
 
 // itemIs - given some path, returns a bool

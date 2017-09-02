@@ -13,6 +13,10 @@ func (m Actor) S() []string {
 	return m.it.S()
 }
 
+func (m Actor) Len() int {
+	return m.it.Len()
+}
+
 func (m Actor) Close() error {
 	return m.it.Close()
 }

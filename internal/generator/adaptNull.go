@@ -14,6 +14,10 @@ func (n Null) S() []string {
 	return []string{}
 }
 
+func (n Null) Len() int {
+	return 0
+}
+
 func (n Null) Close() error {
 	return nil
 }

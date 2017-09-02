@@ -24,6 +24,10 @@ func (template Template) S() []string {
 	return t.Names(template)
 }
 
+func (template Template) Len() int {
+	return len(template.S())
+}
+
 // Close - pretend to be a Closer (<=> an io.Closer)
 func (template Template) Close() error {
 	return nil
