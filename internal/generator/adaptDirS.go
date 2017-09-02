@@ -18,6 +18,10 @@ type DirS []struct {
 	Recurse bool
 }
 
+// Beg implement Some
+
+// S -
+// return all DirPath & dots(Recurse)
 func (d DirS) S() []string {
 	s := []string{}
 	for i := range d {
@@ -64,6 +68,8 @@ func (d DirS) flagPrint(flag, verbose bool, header string) {
 		}
 	}
 }
+
+// End implement Some
 
 // AsDirS - a helper for type conversion
 func AsDirS(i DirS) DirS {

@@ -20,6 +20,10 @@ func NewPrev(size, buff int) prevPile {
 	return prevPile{gen.MakeStringPile(size, buff)}
 }
 
+// Beg implement Some
+
+// S -
+// wait for Done
 func (p prevPile) S() []string {
 	return <-p.Done()
 }
@@ -54,6 +58,8 @@ func (p prevPile) flagPrint(flag, verbose bool, header string) {
 	}
 }
 
+// End implement Some
+
 func (p prevPile) Action(is ...itemIs) *Actor {
 	actor := Actor{p, func(item string) {
 		for i := range is {
@@ -65,3 +71,5 @@ func (p prevPile) Action(is ...itemIs) *Actor {
 	}}
 	return &actor
 }
+
+// End implement SomeWithAction

@@ -35,6 +35,8 @@ func NewData(name string) *dot.Dot {
 	return dot.New(name)
 }
 
+// Beg implement Some
+
 /*
 // flagPrint  prints the data tree, iff flag is true
 func (data Dot) flagPrint(flag bool, header string) {
@@ -44,6 +46,8 @@ func (data Dot) flagPrint(flag bool, header string) {
 	}
 }
 */
+
+// End implement Some
 
 // ifPrintDataTree prints the data tree, iff flag is true
 func (t *toDo) ifPrintDataTree(flag, verbose bool, header string) {

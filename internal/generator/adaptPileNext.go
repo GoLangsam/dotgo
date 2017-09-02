@@ -20,6 +20,10 @@ func NewNext(size, buff int) nextPile {
 	return nextPile{gen.MakeStringPile(size, buff)}
 }
 
+// Beg implement Some
+
+// S -
+// wait for Done
 func (p nextPile) S() []string {
 	return <-p.Done()
 }
@@ -52,6 +56,8 @@ func (p nextPile) flagPrint(flag, verbose bool, header string) {
 	}
 }
 
+// End implement Some
+
 func (p nextPile) Action(is ...itemIs) *Actor {
 	actor := Actor{p, func(item string) {
 		for i := range is {
@@ -63,3 +69,5 @@ func (p nextPile) Action(is ...itemIs) *Actor {
 	}}
 	return &actor
 }
+
+// End implement SomeWithAction

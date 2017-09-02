@@ -14,10 +14,16 @@ func NewNull() Null {
 	return Null{}
 }
 
+// Beg implement Some
+
+// S -
+// is an empty slice
 func (n Null) S() []string {
 	return []string{}
 }
 
+// Len -
+// is zero
 func (n Null) Len() int {
 	return 0
 }
@@ -39,3 +45,19 @@ func (n Null) flagPrint(flag, verbose bool, header string) {
 		}
 	}
 }
+
+// End implement Some
+
+func (n Null) Action(is ...itemIs) *Actor {
+	actor := Actor{n, func(item string) {
+		for i := range is {
+			if is[i](item) {
+				fmt.Println(tab, item, tab, tab)
+				return
+			}
+		}
+	}}
+	return &actor
+}
+
+// End implement SomeWithAction

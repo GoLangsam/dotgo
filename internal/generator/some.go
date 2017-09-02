@@ -13,6 +13,12 @@ type Some interface {
 	flagPrint(flag, verbose bool, header string)   // conditional print
 }
 
+// SomeWithAction represents some with an Action constructor
+type SomeWithAction interface {
+	Some
+	Action(is ...itemIs) *Actor
+}
+
 // itemIs - given some path, returns a bool
 type itemIs func(path string) bool
 

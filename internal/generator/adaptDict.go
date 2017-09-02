@@ -20,6 +20,14 @@ func NewDict() Dict {
 	return Dict{lsm.New()}
 }
 
+// Beg implement Some
+
+// S -
+// inherited
+
+// Len -
+// inherited
+
 // Close - pretend to be a Closer (<=> an io.Closer)
 func (d Dict) Close() error {
 	return nil
@@ -52,6 +60,8 @@ func (d Dict) flagPrint(flag, verbose bool, header string) {
 	}
 }
 
+// End implement Some
+
 func (d Dict) Action(is ...itemIs) *Actor {
 	actor := Actor{d, func(item string) {
 		for i := range is {
@@ -63,3 +73,5 @@ func (d Dict) Action(is ...itemIs) *Actor {
 	}}
 	return &actor
 }
+
+// End implement SomeWithAction

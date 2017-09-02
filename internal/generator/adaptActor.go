@@ -9,10 +9,16 @@ type Actor struct {
 	do itemDo // what to do to it
 }
 
+// Beg implement Some
+
+// S -
+// delegate to it
 func (m Actor) S() []string {
 	return m.it.S()
 }
 
+// Len -
+// delegate to it
 func (m Actor) Len() int {
 	return m.it.Len()
 }
@@ -25,10 +31,13 @@ func (m Actor) Walker(quit func() bool, out ...*Actor) func() {
 	return m.it.Walker(quit, out...)
 }
 
-// flagPrint delegates to it
+// flagPrint -
+// delegate to it
 func (m Actor) flagPrint(flag, verbose bool, header string) {
 	m.it.flagPrint(flag, verbose, header)
 }
+
+// End implement Some
 
 func ActorsClose(out ...*Actor) {
 	for i := range out {

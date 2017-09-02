@@ -12,8 +12,8 @@ import (
 var _ Some = new(Actor)
 
 // var _ Some = NewData(aDot) // missing: Add Walker
-var _ Some = NewDict()
-var _ Some = NewNull()
-var _ Some = NewNext(0, 0)
-var _ Some = NewPrev(0, 0)
+var _ SomeWithAction = NewDict()
+var _ SomeWithAction = NewNull()
+var _ SomeWithAction = NewNext(0, 0)
+var _ SomeWithAction = NewPrev(0, 0)
 var _ Some = NewTemplate(aDot) // missing: Add Walker
