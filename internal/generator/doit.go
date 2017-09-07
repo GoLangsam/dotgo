@@ -16,6 +16,7 @@ import (
 //  - file system analysis (where to look)
 //  - collection of metadata from templates
 //  - execution of all relevant templates
+// TODO use an adaptive cache instead of fic
 // TODO dirS shall be absolute, if we intend to move os.Getwd during Exec
 func DoIt() error {
 

@@ -20,9 +20,9 @@ var (
 )
 
 func init() {
-	const new = "\n"
+	const eol = "\n"
 	const lin = "----------"
-	const sep = new + lin + lin + lin + lin + lin + lin + lin + lin + lin + lin + new
+	const sep = eol + lin + lin + lin + lin + lin + lin + lin + lin + lin + lin + eol
 
 	flag.BoolVar(&a_, "a", false, "print all analysis info:")
 	flag.BoolVar(&aa, "aa", false, "print analysis arguments(s)")
