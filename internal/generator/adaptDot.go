@@ -64,7 +64,7 @@ func (t *toDo) ifPrintDataTree(flag, verbose bool, header string) {
 // flagPrintDataTree prints the data tree, iff flag is true
 func flagPrintDataTree(flag bool, data Dot, prefix string) {
 	if flag {
-		fmt.Println(prefix + "\t<- " + "Data: >>")
+		fmt.Println(prefix, tab, arr, "Data: >>")
 		data.PrintTree(">>")
 	}
 }
@@ -99,7 +99,7 @@ func SeeError(data *dot.Dot, err error, prefix string) bool {
 		return false
 	default:
 		data.SeeError("DotGo", prefix, err)
-		fmt.Println(prefix+":\t"+ErrorName+"\t", err.Error())
+		fmt.Println(prefix, ":", tab, ErrorName, tab, err.Error())
 		return true
 	}
 }
