@@ -19,6 +19,9 @@ func nameLessExt(path string) string {
 	return strings.TrimSuffix(name, filepath.Ext(name))
 }
 
+// IsDotNonsense matches .git or other dot nonsense.
+func IsDotNonsense(name string) bool { return strings.HasPrefix(name, ".") }
+
 // matchBool - iff flag
 func matchBool(flag bool) itemIs {
 	return func(path string) bool {
