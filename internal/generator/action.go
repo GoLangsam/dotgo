@@ -4,6 +4,10 @@
 
 package gen
 
+import (
+	"path/filepath"
+)
+
 // doer - just do something
 func doer(do func()) *Actor       { a := Actor{NewNull(), func(item string) { do() }}; return &a }
 func doit(do func(string)) *Actor { a := Actor{NewNull(), func(item string) { do(item) }}; return &a }
@@ -61,4 +65,31 @@ func (template Template) nameParse(name, body string) (Template, error) {
 
 	_, err = tmpl.Parse(body) // Parse the data
 	return tmpl, err
+}
+
+func (template Template) apply(
+	path string,
+	data Dot,
+) *Actor {
+	actor := Actor{template, func(item string) {
+		flagPrintString(wd, "Apply", data.String()+tab+arr+item)
+		byteS, err := Apply(data, template, item)
+		if !data.SeeError("Execute", item, err) {
+			flagPrintByteS(wr, byteS, ">>>>Raw text of "+item+" & "+data.String())
+			if ugo {
+				filename := filepath.Join(path, FileName(data, item+".ugo"))
+				data.SeeError("Write Raw", filename, Write(data, filename, byteS))
+			}
+			if !nof {
+				byteS, err = Source(byteS)
+				data.SeeError("Format", item, err)
+			}
+			flagPrintByteS(wf || nos, byteS, ">>>>Final text of "+item+" & "+data.String())
+			filename := filepath.Join(path, FileName(data, item))
+			if exe {
+				data.SeeError("Write", filename, Write(data, filename, byteS))
+			}
+		}
+	}}
+	return &actor
 }
