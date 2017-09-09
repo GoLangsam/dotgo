@@ -145,3 +145,12 @@ func (d *StringPile) Done() (done <-chan []string) {
 	}(cha, d)
 	return cha
 }
+
+// Clone returns a (pointer to a) fresh pile
+// with a copy of the original list of known items
+func (d *StringPile) Clone() *StringPile {
+
+	pile := MakeStringPile(cap(d.list), cap(d.pile))
+	copy(pile.list, d.list)
+	return pile
+}
