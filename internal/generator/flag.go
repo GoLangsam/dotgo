@@ -63,7 +63,7 @@ func init() {
 	flag.BoolVar(&wfv, "wfv", false, "...verbose")
 	flag.BoolVar(&wrv, "wrv", false, "...verbose"+sep)
 
-	flag.BoolVar(&nof, "nof", true, "no formatting - do not apply go/format to raw text")
+	flag.BoolVar(&nof, "nof", false, "no formatting - do not apply go/format to raw text")
 	flag.BoolVar(&nos, "nos", false, "no safe - print resulting text only")
 	flag.BoolVar(&nox, "nox", false, "no execute - terminate after main analysis"+sep)
 
