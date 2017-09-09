@@ -5,6 +5,7 @@
 package gen
 
 import (
+	"io/ioutil"
 	"path/filepath"
 )
 
@@ -78,7 +79,7 @@ func (template Template) apply(
 			flagPrintByteS(wr, byteS, ">>>>Raw text of "+item+" & "+data.String())
 			if ugo {
 				filename := filepath.Join(path, FileName(data, item+".ugo"))
-				data.SeeError("Write Raw", filename, Write(data, filename, byteS))
+				data.SeeError("Write Raw", filename, ioutil.WriteFile(filename, byteS, 0644))
 			}
 			if !nof {
 				byteS, err = Source(byteS)
@@ -87,9 +88,26 @@ func (template Template) apply(
 			flagPrintByteS(wf || nos, byteS, ">>>>Final text of "+item+" & "+data.String())
 			filename := filepath.Join(path, FileName(data, item))
 			if exe {
-				data.SeeError("Write", filename, Write(data, filename, byteS))
+				data.SeeError("Write", filename, ioutil.WriteFile(filename, byteS, 0644))
 			}
 		}
 	}}
 	return &actor
+}
+
+// FileName resolves name as a template, executed against data
+func FileName(data Dot, name string) string {
+	id := "FileName"
+	fileName := name
+	template := NewTemplate(id)
+	if tmpl, err := template.Parse(fileName); err == nil {
+		if byteS, err := Apply(data, Template{tmpl}, id); err == nil {
+			fileName = string(byteS)
+		} else {
+			panic(id + ": Apply: Error: " + err.Error())
+		}
+	} else {
+		panic(id + ": Parse: Error: " + err.Error())
+	}
+	return fileName
 }
