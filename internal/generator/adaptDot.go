@@ -93,13 +93,14 @@ func HaveErrors(d *dot.Dot) (*dot.Dot, bool) {
 }
 
 // SeeError returns true iff err is non-nil (after registering it)
-func SeeError(data *dot.Dot, err error, prefix string) bool {
+// TODO obsolete?
+func SeeError(data Dot, err error, prefix string) bool {
 	switch {
 	case err == nil:
 		return false
 	default:
 		data.SeeError("DotGo", prefix, err)
-		fmt.Println(prefix, ":", tab, ErrorName, tab, err.Error())
+		fmt.Println(prefix, ":", tab, ErrorName, tab, err.Error(), tab)
 		return true
 	}
 }
