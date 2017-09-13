@@ -14,7 +14,7 @@ const (
 	tab = "\t"
 	cnt = "#"
 	arr = "<-"
-	don = " Done!"
+	don = "Done!"
 	rec = "... recurse"
 )
 
@@ -32,7 +32,8 @@ func dots(flag bool) string {
 func flagOpen(flag bool, prefix string) time.Time {
 	runtime.GC()
 	if flag {
-		fmt.Print(prefix, tab, arr, tab)
+		fmt.Println(tab, tab, tab)
+		fmt.Print(prefix, tab, arr, tab, tab)
 	}
 	return time.Now()
 }
@@ -48,7 +49,8 @@ func flagDot(flag bool, char string) {
 func flagClose(flag bool, start time.Time) {
 	if flag {
 		dur := time.Since(start)
-		fmt.Println(tab, arr, don, tab, dur, tab)
+		fmt.Println(tab, tab, tab)
+		fmt.Println("", tab, arr, don, tab, dur, tab)
 	}
 	runtime.GC()
 }
