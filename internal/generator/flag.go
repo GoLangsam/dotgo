@@ -11,8 +11,8 @@ import (
 var (
 	a_, aa, ad, ar, at, af, an, am, ap     bool   // print analysis
 	aav, adv, arv, atv, afv, anv, amv, apv bool   // ...verbose
-	e_, ea, ed, et, el                     bool   // print exec
-	eav, edv, etv, elv                     bool   // ...verbose
+	e_, ea, ed, em, et, el                 bool   // print exec
+	eav, edv, emv, etv, elv                bool   // ...verbose
 	w_, wd, wf, wr                         bool   // print write
 	wdv, wfv, wrv                          bool   // ...verbose
 	exe, ugo, nof, nox, nos                bool   // write
@@ -47,11 +47,13 @@ func init() {
 	flag.BoolVar(&ea, "ea", false, "print execution path")
 	flag.BoolVar(&el, "el", false, "print execution line")
 	flag.BoolVar(&ed, "ed", false, "print execution datatree")
+	flag.BoolVar(&em, "em", false, "print execution meta files")
 	flag.BoolVar(&et, "et", false, "print execution template names")
 
 	flag.BoolVar(&eav, "eav", false, "...verbose")
 	flag.BoolVar(&elv, "elv", false, "...verbose")
 	flag.BoolVar(&edv, "edv", false, "...verbose")
+	flag.BoolVar(&emv, "emv", false, "...verbose")
 	flag.BoolVar(&etv, "etv", false, "...verbose"+sep)
 
 	flag.BoolVar(&w_, "w", false, "print all writing info:")
@@ -121,6 +123,9 @@ func flagParse() {
 	if edv {
 		ed = true
 	}
+	if emv {
+		em = true
+	}
 	if etv {
 		et = true
 	}
@@ -147,9 +152,9 @@ func flagParse() {
 	}
 
 	if e_ {
-		ea, ed, el, et = true, true, true, true
+		ea, ed, em, el, et = true, true, true, true, true
 		e_ = false
-	} else if !(ea || ed || el || et) {
+	} else if !(ea || ed || em || el || et) {
 		e_ = true
 	}
 
