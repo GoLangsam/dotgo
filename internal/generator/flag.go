@@ -71,10 +71,10 @@ func init() {
 	flag.BoolVar(&ugo, "xgo", false, "execute: safe raw text (as *.ugo)"+sep)
 
 	flag.StringVar(&tmplread, "ext", ".go.tmpl;.tmpl;dot.go.tmpl",
-		"pattern list to match template file names"+
+		"extension list to match template file names"+
 			"\tNote:"+
-			"\n\tA template gets executed iff first pattern matches it's file!"+
-			"\n\tA directory is writable iff last pattern matches some of it's file!"+
+			"\n\tA template gets executed iff it's file name matches the first extension!"+
+			"\n\tA directory is writable iff some of it's files name matches the last extension!"+
 			"\n\t")
 
 	/*
