@@ -21,6 +21,7 @@ const (
 // Dot defines what is used from "container/ccsafe/dot" to register errors
 type Dot interface {
 	String() string
+	S() []string
 	G(keys ...string) *dot.Dot
 	Clone() *dot.Dot
 	PrintTree(prefix ...string) *dot.Dot
@@ -31,7 +32,7 @@ type Dot interface {
 }
 
 // NewData returns a fresh named dot
-func NewData(name string) *dot.Dot {
+func NewData(name string) Dot {
 	return dot.New(name)
 }
 
@@ -70,7 +71,7 @@ func flagPrintDataTree(flag bool, data Dot, prefix string) {
 }
 
 // flagPrintErrors prints the error(s), iff any
-func flagPrintErrors(data *dot.Dot, prefix string) bool {
+func flagPrintErrors(data Dot, prefix string) bool {
 	e, ok := HaveErrors(data)
 	switch {
 	case ok:
@@ -82,7 +83,7 @@ func flagPrintErrors(data *dot.Dot, prefix string) bool {
 }
 
 // HaveErrors returns the subnode with errors and true, iff any - or nil, false
-func HaveErrors(d *dot.Dot) (*dot.Dot, bool) {
+func HaveErrors(d Dot) (Dot, bool) {
 	_, ok := d.Fetch(ErrorID)
 	switch {
 	case ok:

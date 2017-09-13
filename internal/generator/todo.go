@@ -6,36 +6,23 @@ package gen
 
 import (
 	"context"
-	"sync"
 
-	"github.com/golangsam/container/ccsafe/dot"
 	"github.com/golangsam/do/cli/cancel"
 )
 
 type toDo struct {
-	data *dot.Dot
+	data Dot
 	ctx  context.Context
 	can  context.CancelFunc
-	wg   sync.WaitGroup
 }
 
-func doIt(data *dot.Dot) *toDo {
+func doIt(data Dot) *toDo {
 	ctx, can := cancel.WithCancel()
-	wg := new(sync.WaitGroup)
-	return &toDo{data, ctx, can, *wg}
+	return &toDo{data, ctx, can}
 }
 
-func (t *toDo) doIt(data *dot.Dot) *toDo {
-	return &toDo{data, t.ctx, t.can, t.wg}
-}
-
-func (t *toDo) do(do func()) {
-	t.wg.Add(1)
-
-	go func(t *toDo, do func()) {
-		defer t.wg.Done()
-		do()
-	}(t, do)
+func (t *toDo) quit() func() bool {
+	return func() bool { return t.ctx.Err() != nil }
 }
 
 // ifPrintErrors prints the error(s), iff any
