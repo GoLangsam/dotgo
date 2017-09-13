@@ -44,7 +44,7 @@ func init() {
 	flag.BoolVar(&atv, "atv", false, "...verbose"+sep)
 
 	flag.BoolVar(&e_, "e", false, "print all execution info:")
-	flag.BoolVar(&ea, "ea", false, "print execution path")
+	flag.BoolVar(&ea, "ea", false, "print execution path(s)")
 	flag.BoolVar(&el, "el", false, "print execution line")
 	flag.BoolVar(&ed, "ed", false, "print execution datatree")
 	flag.BoolVar(&em, "em", false, "print execution meta files")
