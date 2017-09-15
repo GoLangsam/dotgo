@@ -5,7 +5,6 @@
 package gen
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -19,16 +18,6 @@ type DirS []struct {
 }
 
 // Beg implement Some
-
-// S -
-// return all DirPath & dots(Recurse)
-func (d DirS) S() []string {
-	s := []string{}
-	for i := range d {
-		s = append(s, d[i].DirPath+tab+dots(d[i].Recurse)+tab)
-	}
-	return s
-}
 
 // Len -
 // how many directories
@@ -61,20 +50,6 @@ func (d DirS) Walker(quit func() bool, out ...*Actor) func() {
 		for i := 0; i < len(d) && !quit(); i++ {
 			dh := ifFlagSkipDirWf(d[i].DirPath, matchBool(d[i].Recurse)) // Recurse?
 			filepath.Walk(d[i].DirPath, isDirWf(quit, dh, fh))           // Walk path
-		}
-	}
-}
-
-// flagPrint prints the path names, iff flag is true
-func (d DirS) flagPrint(flag, verbose bool, header string) {
-	if flag {
-		fmt.Println(header, tab, cnt, len(d), tab, tab)
-
-		if verbose {
-			for i := range d {
-				flagPrintString(flag, d[i].DirPath, dots(d[i].Recurse))
-			}
-			fmt.Println(tab, tab, tab)
 		}
 	}
 }

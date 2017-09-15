@@ -6,7 +6,6 @@ package gen
 
 // Some represents our walkable collections which may contain some strings
 type Some interface {
-	S() []string                                   // content as stringS
 	Len() int                                      // length / count of content
 	Walker(quit func() bool, out ...*Actor) func() // provide traversal thru items - interruptable
 	Close() error                                  // mimic io.Closer - definded locally in order to avoid explicit dependency

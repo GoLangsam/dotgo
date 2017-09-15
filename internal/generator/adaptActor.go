@@ -11,12 +11,6 @@ type Actor struct {
 
 // Beg implement Some
 
-// S -
-// delegate to it
-func (m Actor) S() []string {
-	return m.it.S()
-}
-
 // Len -
 // delegate to it
 func (m Actor) Len() int {
@@ -33,12 +27,6 @@ func (m Actor) Close() error {
 // delegate to it
 func (m Actor) Walker(quit func() bool, out ...*Actor) func() {
 	return m.it.Walker(quit, out...)
-}
-
-// flagPrint -
-// delegate to it
-func (m Actor) flagPrint(flag, verbose bool, header string) {
-	m.it.flagPrint(flag, verbose, header)
 }
 
 // End implement Some

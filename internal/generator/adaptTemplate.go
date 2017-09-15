@@ -5,8 +5,6 @@
 package gen
 
 import (
-	"fmt"
-
 	t "github.com/golangsam/dotgo/internal/texttmpl" // adapter to "text/template"
 	//"github.com/golangsam/dotgo/internal/htmltmpl" // adapter to "html/template"
 )
@@ -24,16 +22,10 @@ func NewTemplate(name string) Template {
 
 // Beg implement Some
 
-// S -
-// return all Names
-func (template Template) S() []string {
-	return t.Names(template)
-}
-
 // Len -
 // how many Names
 func (template Template) Len() int {
-	return len(template.S())
+	return len(template.Templates())
 }
 
 // Close -
@@ -49,24 +41,11 @@ func (template Template) Walker(quit func() bool, out ...*Actor) func() {
 	return func() {
 
 		defer ActorsClose(out...)
-		for _, item := range template.S() {
+		for _, item := range t.Names(template) {
 			if quit() {
 				return // bail out
 			}
 			ActorsDo(item, out...)
-		}
-	}
-}
-
-// flagPrint prints the template, iff flag is true
-func (template Template) flagPrint(flag, verbose bool, header string) {
-	if flag {
-		fmt.Println(header, tab, cnt, template.Len(), tab, tab)
-
-		if verbose {
-			do := func(item string) { fmt.Println(tab, item, tab, tab) }
-			template.Walker(noquit, doit(do))()
-			fmt.Println(tab, tab, tab)
 		}
 	}
 }

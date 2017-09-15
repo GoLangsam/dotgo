@@ -44,14 +44,14 @@ func (s *step) prepDo(d DirS) *step {
 		testPile.Walker(s.done)) // go test => drain
 	s.wg.Wait() // wait for all
 
-	x := s.metaPile.S()
-	y := testPile.S()
+	x := <-s.metaPile.Done()
+	y := <-testPile.Done()
 	if len(x) != len(y) {
 		println("Sizes differ: meta =", len(x), "test =", len(y))
 	}
 
-	x = s.filePile.S()
-	y = tempPile.S()
+	x = <-s.filePile.Done()
+	y = <-tempPile.Done()
 	if len(x) != len(y) {
 		println("Sizes differ: file =", len(x), "temp =", len(y))
 	}

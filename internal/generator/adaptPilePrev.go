@@ -5,8 +5,6 @@
 package gen
 
 import (
-	"fmt"
-
 	"github.com/golangsam/dotgo/internal/pile"
 )
 
@@ -21,13 +19,6 @@ func NewPrev(size, buff int) PrevPile {
 }
 
 // Beg implement Some
-
-// S -
-// wait for Done, and return content of pile
-// Note: content is *not* reversed!
-func (p PrevPile) S() []string {
-	return <-p.Done()
-}
 
 // Len -
 // wait for Done, and return size of pile
@@ -49,21 +40,6 @@ func (p PrevPile) Walker(quit func() bool, out ...*Actor) func() {
 		count := len(itemS)
 		for i := count - 1; i >= 0 && !quit(); i-- {
 			ActorsDo(itemS[i], out...)
-		}
-	}
-}
-
-// flagPrint prints
-// the pile (in reverse order),
-// iff flag is true
-func (p PrevPile) flagPrint(flag, verbose bool, header string) {
-	if flag {
-		fmt.Println(header, tab, cnt, p.Len(), tab, tab)
-
-		if verbose {
-			do := func(item string) { fmt.Println(tab, item, tab, tab) }
-			p.Walker(noquit, doit(do))()
-			fmt.Println(tab, tab, tab)
 		}
 	}
 }

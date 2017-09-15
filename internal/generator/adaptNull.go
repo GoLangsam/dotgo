@@ -16,12 +16,6 @@ func NewNull() Null {
 
 // Beg implement Some
 
-// S -
-// is an empty slice
-func (n Null) S() []string {
-	return []string{}
-}
-
 // Len -
 // is zero
 func (n Null) Len() int {
@@ -38,16 +32,6 @@ func (n Null) Close() error {
 // pretend to walk the empty content :-)
 func (n Null) Walker(quit func() bool, out ...*Actor) func() {
 	return func() { return }
-}
-
-// flagPrint prints nothing but header, iff flag is true
-func (n Null) flagPrint(flag, verbose bool, header string) {
-	if flag {
-		fmt.Println(header, tab, cnt, n.Len(), tab, tab)
-		if verbose {
-			fmt.Println(tab, tab, tab)
-		}
-	}
 }
 
 // End implement Some

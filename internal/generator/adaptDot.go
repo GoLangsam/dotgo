@@ -5,8 +5,6 @@
 package gen
 
 import (
-	"fmt"
-
 	"github.com/golangsam/container/ccsafe/dot"
 )
 
@@ -20,9 +18,6 @@ func NewData(name string) Data {
 }
 
 // Beg implement Some
-
-// S -
-// inherited
 
 // Len -
 // inherited
@@ -45,20 +40,6 @@ func (d Data) Walker(quit func() bool, out ...*Actor) func() {
 				return // bail out
 			}
 			ActorsDo(item, out...)
-		}
-	}
-}
-
-// flagPrint prints
-// the data tree,
-// iff flag is true
-func (d Data) flagPrint(flag, verbose bool, header string) {
-	if flag {
-		fmt.Println(header, tab, cnt, d.Len(), tab, tab)
-
-		if verbose {
-			d.PrintTree(">>")
-			fmt.Println(tab, tab, tab)
 		}
 	}
 }
