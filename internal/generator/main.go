@@ -86,7 +86,7 @@ func (s *step) execDir(path string, recurse bool) *step {
 
 	subDirS := []string{}
 
-	flagFile := doer(func() { flagDot(a_, "~") })
+	flagFile := doer(func() { flagDot(e_, ".") })
 
 	s.do(
 		s.filePile.Walker(s.done, flagFile, // go file =>

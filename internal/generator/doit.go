@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// package gen implements the agnostic template driven text & source generator
 package gen
 
 import (
@@ -10,8 +11,8 @@ import (
 )
 
 // DoIt performs it all:
-//  - establish the participators
-//  - file system analysis (where to look)
+//  - establish the participants
+//  - walk the file system (where to look)
 //  - collect metadata
 //  - execute relevant templates
 // TODO use an adaptive cache instead of fic

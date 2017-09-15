@@ -121,7 +121,7 @@ func (d DirS) flagPrint(flag, verbose bool, header string) {
 		fmt.Println(header, tab, cnt, len(d), tab, tab)
 
 		if verbose {
-			for i := range d {
+			for i := range d { // do not use Walker as we have two items
 				flagPrintString(flag, d[i].DirPath, dots(d[i].Recurse))
 			}
 			fmt.Println(tab, tab, tab)
@@ -155,6 +155,8 @@ func (n Null) flagPrint(flag, verbose bool, header string) {
 		fmt.Println(header, tab, cnt, n.Len(), tab, tab)
 
 		if verbose {
+			do := func(item string) {}
+			n.Walker(noquit, doit(do))()
 			fmt.Println(tab, tab, tab)
 		}
 	}

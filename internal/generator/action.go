@@ -10,8 +10,8 @@ import (
 )
 
 // doer - just do something
-func doer(do func()) Actor       { a := Actor{NewNull(), func(item string) { do() }}; return a }
-func doit(do func(string)) Actor { a := Actor{NewNull(), func(item string) { do(item) }}; return a }
+func doer(do func()) Actor       { return Actor{NewNull(), func(item string) { do() }} }
+func doit(do func(string)) Actor { return Actor{NewNull(), func(item string) { do(item) }} }
 
 func (s *step) tmplParser() Actor {
 	return Actor{s.rootTmpl, func(item string) {

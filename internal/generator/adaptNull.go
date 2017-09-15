@@ -8,8 +8,10 @@ import (
 	"fmt"
 )
 
+// Null represents an empty Some
 type Null struct{}
 
+// NewNull return a fresh Null
 func NewNull() Null {
 	return Null{}
 }
