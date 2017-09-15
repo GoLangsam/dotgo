@@ -32,7 +32,7 @@ func (p NextPile) Len() int {
 // Walker -
 // traverse the pile forward
 // Note: may be used in parallel to p being populated, e.g. as some out *Actor
-func (p NextPile) Walker(quit func() bool, out ...*Actor) func() {
+func (p NextPile) Walker(quit func() bool, out ...Actor) func() {
 
 	return func() {
 
@@ -45,8 +45,8 @@ func (p NextPile) Walker(quit func() bool, out ...*Actor) func() {
 
 // End implement Some
 
-func (p NextPile) Action(is ...itemIs) *Actor {
-	return &Actor{p, func(item string) {
+func (p NextPile) Action(is ...itemIs) Actor {
+	return Actor{p, func(item string) {
 		for i := range is {
 			if is[i](item) {
 				p.Pile(item)

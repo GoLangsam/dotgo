@@ -37,7 +37,7 @@ func (d DirS) Close() error {
 // and descend into its sub-directories
 // iff d[i].Recurse
 // Note: uses filepath.Walk
-func (d DirS) Walker(quit func() bool, out ...*Actor) func() {
+func (d DirS) Walker(quit func() bool, out ...Actor) func() {
 
 	return func() {
 

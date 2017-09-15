@@ -25,19 +25,19 @@ func (m Actor) Close() error {
 
 // Walker -
 // delegate to it
-func (m Actor) Walker(quit func() bool, out ...*Actor) func() {
+func (m Actor) Walker(quit func() bool, out ...Actor) func() {
 	return m.it.Walker(quit, out...)
 }
 
 // End implement Some
 
-func ActorsClose(out ...*Actor) {
+func ActorsClose(out ...Actor) {
 	for i := range out {
 		out[i].it.Close()
 	}
 }
 
-func ActorsDo(item string, out ...*Actor) {
+func ActorsDo(item string, out ...Actor) {
 	for i := range out {
 		out[i].do(item)
 	}

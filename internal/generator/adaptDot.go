@@ -30,7 +30,7 @@ func (d Data) Close() error {
 
 // Walker -
 // traverse the (sorted) child names the data tree node
-func (d Data) Walker(quit func() bool, out ...*Actor) func() {
+func (d Data) Walker(quit func() bool, out ...Actor) func() {
 
 	return func() {
 

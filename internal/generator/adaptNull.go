@@ -30,14 +30,14 @@ func (n Null) Close() error {
 
 // Walker -
 // pretend to walk the empty content :-)
-func (n Null) Walker(quit func() bool, out ...*Actor) func() {
+func (n Null) Walker(quit func() bool, out ...Actor) func() {
 	return func() { return }
 }
 
 // End implement Some
 
-func (n Null) Action(is ...itemIs) *Actor {
-	return &Actor{n, func(item string) {
+func (n Null) Action(is ...itemIs) Actor {
+	return Actor{n, func(item string) {
 		for i := range is {
 			if is[i](item) {
 				fmt.Println(tab, item, tab, tab)

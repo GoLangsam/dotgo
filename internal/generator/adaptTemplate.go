@@ -36,7 +36,7 @@ func (template Template) Close() error {
 
 // Walker -
 // traverse S() - the NameS
-func (template Template) Walker(quit func() bool, out ...*Actor) func() {
+func (template Template) Walker(quit func() bool, out ...Actor) func() {
 
 	return func() {
 
