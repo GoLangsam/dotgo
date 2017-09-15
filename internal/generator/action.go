@@ -45,11 +45,12 @@ func (s *step) metaReader(tmpl Template) Actor {
 
 func (s *step) readMeta(flag, verbose bool, header string) *step {
 
-	tmpl, err := s.rootTmpl.Clone()          // Clone rootTmpl
-	all.Ok("Clone", "Root", err)             // err? ignore for now
-	metaData := s.metaReader(Template{tmpl}) // text/template from meta
-	s.metaPile.Walker(s.done, metaData)()    // meta => metaTmpl & metaData
-	metaData.flagPrint(flag, verbose, header)
+	tmpl, err := s.rootTmpl.Clone() // Clone rootTmpl
+	if all.Ok("Clone", "Root", err) {
+		metaData := s.metaReader(Template{tmpl}) // text/template from meta
+		s.metaPile.Walker(s.done, metaData)()    // meta => metaTmpl & metaData
+		metaData.flagPrint(flag, verbose, header)
+	}
 
 	return s
 }
@@ -81,7 +82,6 @@ func (s *step) apply(path string) Actor {
 					all.Ok("Write", filename, ioutil.WriteFile(filename, byteS, 0644))
 				}
 			}
-
 		}
 	}}
 }

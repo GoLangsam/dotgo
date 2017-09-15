@@ -17,10 +17,8 @@ func (s *step) prepDo(d DirS) *step {
 	flagTemp := doer(func() { flagDot(a_, "-") })
 	flagFile := doer(func() { flagDot(a_, "~") })
 
-	// a temp - for fan-out file names
-	tempPile := NewNext(512, 128)
+	tempPile := NewNext(512, 128) // a temp - for fan-out file names
 	testPile := NewPrev(256, 064) // templates with non-empty meta: apply in reverse order!
-	execDict := NewDict()         // TODO this is wrong: we need the directory! nameLessExt get's appended to base            // mathching file(s) identify folder(s) for execution
 
 	s.do(
 		d.Walker(s.done, flagPrep, // go dirS =>
@@ -30,7 +28,6 @@ func (s *step) prepDo(d DirS) *step {
 	s.do(
 		tempPile.Walker(s.done, flagTemp, // go temp =>
 			s.baseDict.Action(s.isBase), // base
-			execDict.Action(s.isExec),   // exec
 			testPile.Action(s.hasMeta),  // test (meta)
 		))
 	s.do(
@@ -100,47 +97,47 @@ func (s *step) execDir(path string, recurse bool) *step {
 
 	hasExecFiles := false
 	entries, err := ioutil.ReadDir(path)
-	all.Ok("ReadDir", path, err) // err? ignore for now
-	for _, entry := range entries {
-		name := entry.Name()
-		path := filepath.Join(path, name)
+	if all.Ok("ReadDir", path, err) {
+		for _, entry := range entries {
+			name := entry.Name()
+			path := filepath.Join(path, name)
 
-		if !entry.IsDir() {
-			if !hasExecFiles && s.isExec(name) {
-				hasExecFiles = true
-			}
-			if s.isFile(name) {
-				s.filePile.Pile(path)
-			}
-			/*
-				if s.isBase(name) {
-					s.baseDict.Assign(path, nil)
+			if !entry.IsDir() {
+				if !hasExecFiles && s.isExec(name) {
+					hasExecFiles = true
 				}
-			*/
-			continue
+				if s.isFile(name) {
+					s.filePile.Pile(path)
+				}
+				/*
+					if s.isBase(name) {
+						s.baseDict.Assign(path, nil)
+					}
+				*/
+				continue
+			}
+			// Entry is a directory.
+			if recurse && !IsDotNonsense(name) { // No .git or other dot nonsense please.
+				subDirS = append(subDirS, path)
+			}
 		}
-		// Entry is a directory.
-		if recurse && !IsDotNonsense(name) { // No .git or other dot nonsense please.
-			subDirS = append(subDirS, path)
+		s.filePile.Close()
+		<-s.metaPile.Done() // go meta => drain
+		// s.todo.wg.Wait()    // wait for all
+
+		s.metaPile.flagPrint(em, emv, "em-Meta")
+
+		for _, path := range subDirS {
+			path := path
+			s := s.Clone()
+			f := func() { s.execDir(path, recurse) }
+			s.do(f)
+		}
+
+		if hasExecFiles && !nox {
+			s.execPath(path)
 		}
 	}
-	s.filePile.Close()
-	<-s.metaPile.Done() // go meta => drain
-	// s.todo.wg.Wait()    // wait for all
-
-	s.metaPile.flagPrint(em, emv, "em-Meta")
-
-	for _, path := range subDirS {
-		path := path
-		s := s.Clone()
-		f := func() { s.execDir(path, recurse) }
-		s.do(f)
-	}
-
-	if hasExecFiles && !nox {
-		s.execPath(path)
-	}
-
 	return s
 }
 
