@@ -45,10 +45,16 @@ func ifFlagSkipDirWf(root string, match itemIs) filepath.WalkFunc {
 	root = filepath.Clean(root)
 	return func(path string, info os.FileInfo, err error) error {
 		path = filepath.Clean(path)
-		if match(path) || root == path {
+		switch {
+		case IsDotNonsense(info.Name()):
+			return filepath.SkipDir
+		case root == path:
 			return nil
+		case match(path):
+			return nil
+		default:
+			return filepath.SkipDir
 		}
-		return filepath.SkipDir
 	}
 }
 
