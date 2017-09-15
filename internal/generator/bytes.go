@@ -10,7 +10,7 @@ import (
 
 // Apply template name to data; evaluate name (less Ext) against data
 // as filenameWriteFile into dirPath
-func Apply(data Dot, tmpl Template, name string) (byteS []byte, err error) {
+func Apply(data Data, tmpl Template, name string) (byteS []byte, err error) {
 	var buf bytes.Buffer
 	err = tmpl.ExecuteTemplate(&buf, name, data)
 	return buf.Bytes(), err

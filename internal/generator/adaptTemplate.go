@@ -59,19 +59,32 @@ func (template Template) Walker(quit func() bool, out ...*Actor) func() {
 }
 
 // flagPrint prints the template, iff flag is true
-func (tmpl Template) flagPrint(flag, verbose bool, header string) {
+func (template Template) flagPrint(flag, verbose bool, header string) {
 	if flag {
-		fmt.Println(header, tab, cnt, tmpl.Len(), tab, tab)
+		fmt.Println(header, tab, cnt, template.Len(), tab, tab)
 
 		if verbose {
 			do := func(item string) { fmt.Println(tab, item, tab, tab) }
-			tmpl.Walker(noquit, doit(do))()
+			template.Walker(noquit, doit(do))()
 			fmt.Println(tab, tab, tab)
 		}
 	}
 }
 
 // End implement Some
+
+// ParseName is slightly similar to ParseFiles
+func (template Template) ParseName(name, body string) (tmpl Template, err error) {
+
+	if name == template.Name() {
+		tmpl = template
+	} else {
+		tmpl = Template{template.New(name)}
+	}
+
+	parsed, err := tmpl.Parse(body) // Parse the data
+	return Template{parsed}, err
+}
 
 // Meta returns the meta-text extraced from text
 func Meta(text string) (string, error) {

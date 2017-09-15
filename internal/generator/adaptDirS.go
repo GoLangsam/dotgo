@@ -59,8 +59,8 @@ func (d DirS) Walker(quit func() bool, out ...*Actor) func() {
 		}
 
 		for i := 0; i < len(d) && !quit(); i++ {
-			dh := ifFlagSkipDirWf(matchBool(d[i].Recurse))     // Recurse?
-			filepath.Walk(d[i].DirPath, isDirWf(quit, dh, fh)) // Walk path
+			dh := ifFlagSkipDirWf(d[i].DirPath, matchBool(d[i].Recurse)) // Recurse?
+			filepath.Walk(d[i].DirPath, isDirWf(quit, dh, fh))           // Walk path
 		}
 	}
 }

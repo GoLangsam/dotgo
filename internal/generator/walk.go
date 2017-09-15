@@ -41,9 +41,9 @@ func matchFunc(pattern ...string) itemIs {
 	}
 }
 
-func ifFlagSkipDirWf(match itemIs) filepath.WalkFunc {
+func ifFlagSkipDirWf(root string, match itemIs) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
-		if match(path) {
+		if path == filepath.Clean(root) || match(path) {
 			return nil
 		}
 		return filepath.SkipDir

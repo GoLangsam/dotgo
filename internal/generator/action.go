@@ -13,101 +13,78 @@ import (
 func doer(do func()) *Actor       { a := Actor{NewNull(), func(item string) { do() }}; return &a }
 func doit(do func(string)) *Actor { a := Actor{NewNull(), func(item string) { do(item) }}; return &a }
 
-var noquit = func() bool { return false }
-
-func (template Template) tmplParser(
-	data Dot,
-	get func(string) string,
-) *Actor {
-	actor := Actor{template, func(item string) {
+func (s *step) tmplParser() *Actor {
+	actor := Actor{s.rootTmpl, func(item string) {
 
 		var err error
-		text := get(item)
+		text := s.lookupData(item)
 		name := nameLessExt(item)
 
-		_, err = template.nameParse(name, text)
-		data.SeeError("CollectTmpl: Parse:", name, err)
+		_, err = s.rootTmpl.ParseName(name, text)
+		all.Ok("CollectTmpl: Parse:", name, err)
 	}}
 	return &actor
 }
 
-func (template Template) metaParser(
-	data Dot,
-	get func(string) string,
-) *Actor {
-	actor := Actor{template, func(item string) {
+func (s *step) metaReader(tmpl Template) *Actor {
+	actor := Actor{tmpl, func(item string) {
 
 		var err error
-		text := get(item)
+		text := s.lookupData(item)
 		name := nameLessExt(item) + ".meta"
 
 		meta, err := Meta(text) // extract meta-data
-		data.SeeError("CollectMeta: Extract:", name, err)
+		all.Ok("CollectMeta: Extract:", name, err)
 
-		tmpl, err := template.nameParse(name, meta) // Parse the meta-data
-		data.SeeError("CollectMeta: Parse:", name, err)
+		tmpl, err := tmpl.ParseName(name, meta) // Parse the meta-data
+		all.Ok("CollectMeta: Parse:", name, err)
 
-		_, err = Apply(data, tmpl, name)
-		data.SeeError("CollectMeta: Apply:", name, err)
+		_, err = Apply(s.dataTree, tmpl, name)
+		all.Ok("CollectMeta: Apply:", name, err)
 	}}
 	return &actor
 }
 
-// nameParse is slightly similar to ParseFiles
-func (template Template) nameParse(name, body string) (Template, error) {
+func (s *step) readMeta(flag, verbose bool, header string) *step {
 
-	var err error
-	var tmpl Template
-	if name == template.Name() {
-		tmpl = template
-	} else {
-		tmpl = Template{template.New(name)}
-	}
+	tmpl, err := s.rootTmpl.Clone()          // Clone rootTmpl
+	all.Ok("Clone", "Root", err)             // err? ignore for now
+	metaData := s.metaReader(Template{tmpl}) // text/template from meta
+	s.metaPile.Walker(s.done, metaData)()    // meta => metaTmpl & metaData
+	metaData.flagPrint(flag, verbose, header)
 
-	_, err = tmpl.Parse(body) // Parse the data
-	return tmpl, err
+	return s
 }
 
-func (template Template) apply(
-	path string,
-	data Dot,
-) *Actor {
-	actor := Actor{template, func(item string) {
-		flagPrintString(wd, "Apply", data.String()+tab+arr+item)
-		byteS, err := Apply(data, template, item)
-		if !data.SeeError("Execute", item, err) {
-			flagPrintByteS(wr, byteS, ">>>>Raw text of "+item+" & "+data.String())
-			if ugo {
-				filename := filepath.Join(path, FileName(data, item+".ugo"))
-				data.SeeError("Write Raw", filename, ioutil.WriteFile(filename, byteS, 0644))
+func (s *step) apply(path string) *Actor {
+	actor := Actor{s.rootTmpl, func(item string) {
+		flagPrintString(wd, "Apply", path+tab+arr+item)
+
+		// path - where we are
+		// item - template name
+		// id - root node name
+		for _, node := range s.dataTree.DownS() {
+			name := node.String()
+			node := Data{node}
+			byteS, err := Apply(node, s.rootTmpl, item)
+			if all.Ok("Execute", item, err) {
+				flagPrintByteS(wr, byteS, ">>>>Raw text of "+item+" & "+name)
+				if ugo {
+					filename := filepath.Join(path, node.FileName(nameLessExt(item)+".ugo"))
+					all.Ok("Write Raw", filename, ioutil.WriteFile(filename, byteS, 0644))
+				}
+				if !nof {
+					byteS, err = Source(byteS)
+					all.Ok("Format", item, err)
+				}
+				flagPrintByteS(wf || nos, byteS, ">>>>Final text of "+item+" & "+name)
+				filename := filepath.Join(path, node.FileName(item))
+				if exe {
+					all.Ok("Write", filename, ioutil.WriteFile(filename, byteS, 0644))
+				}
 			}
-			if !nof {
-				byteS, err = Source(byteS)
-				data.SeeError("Format", item, err)
-			}
-			flagPrintByteS(wf || nos, byteS, ">>>>Final text of "+item+" & "+data.String())
-			filename := filepath.Join(path, FileName(data, item))
-			if exe {
-				data.SeeError("Write", filename, ioutil.WriteFile(filename, byteS, 0644))
-			}
+
 		}
 	}}
 	return &actor
-}
-
-// FileName resolves name as a template, executed against data
-func FileName(data Dot, name string) string {
-	id := "FileName"
-	fileName := name
-	template := NewTemplate(id)
-	if tmpl, err := template.Parse(fileName); err == nil {
-		if byteS, err := Apply(data, Template{tmpl}, id); err == nil {
-			fileName = string(byteS)
-		} else {
-			panic(id + ": Apply: Error: " + err.Error())
-		}
-	} else {
-		panic(id + ": Parse: Error: " + err.Error())
-	}
-	return fileName
 }

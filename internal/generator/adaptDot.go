@@ -10,98 +10,72 @@ import (
 	"github.com/golangsam/container/ccsafe/dot"
 )
 
-// constants borrowed from package `dot`
-const (
-	// ErrorName is the name of a node-type error
-	ErrorName = dot.ErrorName
-	// ErrorID is the ID of of a node of type error
-	ErrorID = dot.ErrorID
-)
-
-// Dot defines what is used from "container/ccsafe/dot" to register errors
-type Dot interface {
-	String() string
-	S() []string
-	G(keys ...string) *dot.Dot
-	Clone() *dot.Dot
-	PrintTree(prefix ...string) *dot.Dot
-
-	Fetch(key string) (interface{}, bool) // for ShowErrors
-	SeeError(myName, myThing string, err error) bool
-	//SeeNotOk(myName, myThing string, ok bool, complain string) bool
+type Data struct {
+	*dot.Dot
 }
 
 // NewData returns a fresh named dot
-func NewData(name string) Dot {
-	return dot.New(name)
+func NewData(name string) Data {
+	return Data{dot.New(name)}
 }
 
 // Beg implement Some
 
-/*
-// flagPrint  prints the data tree, iff flag is true
-func (data Dot) flagPrint(flag bool, header string) {
-	if flag {
-		flagPrintDataTree(true, data, header)
-		fmt.Println()
+// S -
+// inherited
+
+// Len -
+// inherited
+
+// Close -
+// pretend to be a Closer (<=> an io.Closer)
+func (d Data) Close() error {
+	return nil
+}
+
+// Walker -
+// traverse the (sorted) child names the data tree node
+func (d Data) Walker(quit func() bool, out ...*Actor) func() {
+
+	return func() {
+
+		defer ActorsClose(out...)
+		for _, item := range d.S() {
+			if quit() {
+				return // bail out
+			}
+			ActorsDo(item, out...)
+		}
 	}
 }
-*/
 
-// End implement Some
-
-// ifPrintDataTree prints the data tree, iff flag is true
-func (t *toDo) ifPrintDataTree(flag, verbose bool, header string) {
+// flagPrint prints
+// the data tree,
+// iff flag is true
+func (d Data) flagPrint(flag, verbose bool, header string) {
 	if flag {
-		fmt.Println(header, tab, cnt, len(t.data.S()), tab, tab)
+		fmt.Println(header, tab, cnt, d.Len(), tab, tab)
 
 		if verbose {
-			flagPrintDataTree(verbose, t.data, header)
+			d.PrintTree(">>")
 			fmt.Println(tab, tab, tab)
 		}
 	}
 }
 
-// flagPrintDataTree prints the data tree, iff flag is true
-func flagPrintDataTree(flag bool, data Dot, prefix string) {
-	if flag {
-		fmt.Println(prefix, tab, arr, "Data: >>")
-		data.PrintTree(">>")
-	}
-}
+// End implement Some
 
-// flagPrintErrors prints the error(s), iff any
-func flagPrintErrors(data Dot, prefix string) bool {
-	e, ok := HaveErrors(data)
-	switch {
-	case ok:
-		flagPrintDataTree(true, e, ErrorName)
-		return true
-	default:
-		return false
+// FileName resolves name as a template, executed against data
+func (d Data) FileName(name string) string {
+	id := "FileName"
+	fileName := name
+	template := NewTemplate(id)
+	tmpl, err := template.Parse(fileName)
+	if all.Ok("Parse", id, err) {
+		byteS, err := Apply(d, Template{tmpl}, id)
+		if all.Ok("Apply", id, err) {
+			fileName = string(byteS)
+		}
 	}
-}
-
-// HaveErrors returns the subnode with errors and true, iff any - or nil, false
-func HaveErrors(d Dot) (Dot, bool) {
-	_, ok := d.Fetch(ErrorID)
-	switch {
-	case ok:
-		return d.G(ErrorID), true
-	default:
-		return nil, false
-	}
-}
-
-// SeeError returns true iff err is non-nil (after registering it)
-// TODO obsolete?
-func SeeError(data Dot, err error, prefix string) bool {
-	switch {
-	case err == nil:
-		return false
-	default:
-		data.SeeError("DotGo", prefix, err)
-		fmt.Println(prefix, ":", tab, ErrorName, tab, err.Error(), tab)
-		return true
-	}
+	return fileName
 }

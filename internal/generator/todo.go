@@ -11,21 +11,17 @@ import (
 )
 
 type toDo struct {
-	data Dot
-	ctx  context.Context
-	can  context.CancelFunc
+	ctx context.Context
+	can context.CancelFunc
 }
 
-func doIt(data Dot) *toDo {
+func doIt() *toDo {
 	ctx, can := cancel.WithCancel()
-	return &toDo{data, ctx, can}
+	return &toDo{ctx, can}
 }
 
-func (t *toDo) quit() func() bool {
-	return func() bool { return t.ctx.Err() != nil }
+func (s *step) done() bool {
+	return s.todo.ctx.Err() != nil
 }
 
-// ifPrintErrors prints the error(s), iff any
-func (t *toDo) ifPrintErrors(header string) bool {
-	return flagPrintErrors(t.data, header)
-}
+var noquit = func() bool { return false }

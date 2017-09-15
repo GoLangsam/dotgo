@@ -10,14 +10,14 @@ import (
 	"github.com/golangsam/dotgo/internal/pile"
 )
 
-// prevPile represents a forward traversed Pile
-type prevPile struct {
+// prevPile represents a Pile traversed backward
+type PrevPile struct {
 	*gen.StringPile
 }
 
 // NewPrev returns a new dictionary
-func NewPrev(size, buff int) prevPile {
-	return prevPile{gen.MakeStringPile(size, buff)}
+func NewPrev(size, buff int) PrevPile {
+	return PrevPile{gen.MakeStringPile(size, buff)}
 }
 
 // Beg implement Some
@@ -25,13 +25,13 @@ func NewPrev(size, buff int) prevPile {
 // S -
 // wait for Done, and return content of pile
 // Note: content is *not* reversed!
-func (p prevPile) S() []string {
+func (p PrevPile) S() []string {
 	return <-p.Done()
 }
 
 // Len -
 // wait for Done, and return size of pile
-func (p prevPile) Len() int {
+func (p PrevPile) Len() int {
 	return len(<-p.Done())
 }
 
@@ -40,7 +40,7 @@ func (p prevPile) Len() int {
 
 // Walker -
 // traverse the pile - backward
-func (p prevPile) Walker(quit func() bool, out ...*Actor) func() {
+func (p PrevPile) Walker(quit func() bool, out ...*Actor) func() {
 
 	return func() {
 
@@ -56,7 +56,7 @@ func (p prevPile) Walker(quit func() bool, out ...*Actor) func() {
 // flagPrint prints
 // the pile (in reverse order),
 // iff flag is true
-func (p prevPile) flagPrint(flag, verbose bool, header string) {
+func (p PrevPile) flagPrint(flag, verbose bool, header string) {
 	if flag {
 		fmt.Println(header, tab, cnt, p.Len(), tab, tab)
 
@@ -70,8 +70,8 @@ func (p prevPile) flagPrint(flag, verbose bool, header string) {
 
 // End implement Some
 
-func (p prevPile) Action(is ...itemIs) *Actor {
-	actor := Actor{p, func(item string) {
+func (p PrevPile) Action(is ...itemIs) *Actor {
+	return &Actor{p, func(item string) {
 		for i := range is {
 			if is[i](item) {
 				p.Pile(item)
@@ -79,7 +79,6 @@ func (p prevPile) Action(is ...itemIs) *Actor {
 			}
 		}
 	}}
-	return &actor
 }
 
 // End implement SomeWithAction

@@ -53,7 +53,7 @@ func (n Null) flagPrint(flag, verbose bool, header string) {
 // End implement Some
 
 func (n Null) Action(is ...itemIs) *Actor {
-	actor := Actor{n, func(item string) {
+	return &Actor{n, func(item string) {
 		for i := range is {
 			if is[i](item) {
 				fmt.Println(tab, item, tab, tab)
@@ -61,7 +61,6 @@ func (n Null) Action(is ...itemIs) *Actor {
 			}
 		}
 	}}
-	return &actor
 }
 
 // End implement SomeWithAction
