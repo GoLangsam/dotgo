@@ -4,6 +4,10 @@
 
 package gen
 
+import (
+	"sync"
+)
+
 // This file was generated with dotgo
 // DO NOT EDIT - Improve the pattern!
 
@@ -43,6 +47,7 @@ type StringPile struct {
 	pile   chan string // channel to receive further items
 	list   []string    // list of known items
 	offset int         // index for Next()
+	mu     sync.Mutex  // guard offset
 }
 
 // MakeStringPile returns a (pointer to a) fresh pile
@@ -92,8 +97,10 @@ func (d *StringPile) Close() (err error) {
 // Usage for a pile `p`:
 //  for item, ok := p.Iter(); ok; item, ok = p.Next() { ... do sth with item ... }
 func (d *StringPile) Iter() (item string, ok bool) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
 	d.offset = 0
-	return d.Next()
+	return d.next()
 }
 
 // Next returns the next item,
@@ -102,6 +109,12 @@ func (d *StringPile) Iter() (item string, ok bool) {
 // Note: Iff the pile is not closed yet,
 // Next may block, awaiting some Pile().
 func (d *StringPile) Next() (item string, ok bool) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	return d.next()
+}
+
+func (d *StringPile) next() (item string, ok bool) {
 	if d.offset < len(d.list) {
 		ok = true
 		item = d.list[d.offset]
@@ -131,13 +144,15 @@ func (d *StringPile) Next() (item string, ok bool) {
 func (d *StringPile) Done() (done <-chan []string) {
 	cha := make(chan []string)
 	go func(cha chan<- []string, d *StringPile) {
+		d.mu.Lock()
+		defer d.mu.Unlock()
 		defer close(cha)
 		d.offset = 0
 		if len(d.list) > d.offset {
 			// skip what's already known
 			d.offset = len(d.list)
 		}
-		for _, ok := d.Next(); ok; _, ok = d.Next() {
+		for _, ok := d.next(); ok; _, ok = d.next() {
 			// keep draining
 		}
 		d.offset = 0  // reset
@@ -149,7 +164,8 @@ func (d *StringPile) Done() (done <-chan []string) {
 // Clone returns a (pointer to a) fresh pile
 // with a copy of the original list of known items
 func (d *StringPile) Clone() *StringPile {
-
+	d.mu.Lock()
+	defer d.mu.Unlock()
 	pile := MakeStringPile(cap(d.list), cap(d.pile))
 	copy(pile.list, d.list)
 	return pile
