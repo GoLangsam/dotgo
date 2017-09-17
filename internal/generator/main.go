@@ -32,7 +32,7 @@ func (s *step) prepDo(d DirS) *step {
 		))
 	s.do(
 		s.filePile.Walker(s.done, flagFile, // go file =>
-			s.tmplParser(),               // rootTmpl
+			s.tmplParser(s.lookupData),   // rootTmpl
 			s.metaPile.Action(s.hasMeta), // meta (*this* works!?!)
 		))
 	s.do(
@@ -90,7 +90,7 @@ func (s *step) execDir(path string, recurse bool) *step {
 
 	s.do(
 		s.filePile.Walker(s.done, flagFile, // go file =>
-			s.tmplParser(),               // rootTmpl
+			s.tmplParser(s.lookupData),   // rootTmpl
 			s.metaPile.Action(s.hasMeta), // meta (*this* works!?!)
 			s.baseDict.Action(s.isBase),  // base
 		))

@@ -10,7 +10,7 @@ package fsc
 import (
 	"fmt"
 
-	"github.com/golangsam/container/ccsafe/fs"
+	"github.com/GoLangsam/container/ccsafe/fs"
 )
 
 // FsInfoSPrintFunc is a simple helper for PipeFsInfoSFunc

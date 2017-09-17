@@ -5,11 +5,11 @@
 package dottmpl
 
 import (
-	"github.com/golangsam/dotgo/internal/args"
-	f "github.com/golangsam/dotgo/internal/fs"  // adapter to file system (via "container/ccsafe/fs"
-	a "github.com/golangsam/dotgo/internal/fsa" // adapter to file system analysis
+	"github.com/GoLangsam/dotgo/internal/args"
+	f "github.com/GoLangsam/dotgo/internal/fs"  // adapter to file system (via "container/ccsafe/fs"
+	a "github.com/GoLangsam/dotgo/internal/fsa" // adapter to file system analysis
 
-	"github.com/golangsam/container/ccsafe/fs"
+	"github.com/GoLangsam/container/ccsafe/fs"
 )
 
 const (

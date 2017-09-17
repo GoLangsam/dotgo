@@ -7,7 +7,7 @@ package args
 import (
 	"fmt"
 
-	"github.com/golangsam/container/ccsafe/dotpath"
+	"github.com/GoLangsam/container/ccsafe/dotpath"
 )
 
 // IfPrintFlagArgs prints the arguments, iff flag is true

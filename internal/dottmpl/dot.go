@@ -7,7 +7,7 @@ package dottmpl
 import (
 	"fmt"
 
-	"github.com/golangsam/container/ccsafe/dot"
+	"github.com/GoLangsam/container/ccsafe/dot"
 )
 
 // constants borrowed from package `dot`

@@ -9,7 +9,7 @@ import (
 	"sort"
 	"text/template"
 
-	ds "github.com/golangsam/do/strings" // Extract
+	ds "github.com/GoLangsam/do/strings" // Extract
 )
 
 const (

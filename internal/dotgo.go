@@ -7,7 +7,7 @@ package main
 import (
 	"fmt"
 
-	doit "github.com/golangsam/dotgo/internal/generator"
+	doit "github.com/GoLangsam/dotgo/internal/generator"
 )
 
 func main() {

@@ -42,9 +42,7 @@ func NewStep(lookupData func(string) string) *step {
 	// s.isTrue = matchBool(true)
 	s.hasMeta = func(item string) bool {
 		meta, err := Meta(s.lookupData(item))
-		if err != nil {
-			all.Ok("hasMeta", item, err)
-		}
+		all.Ok("hasMeta", item, err)
 		return meta != ""
 	}
 
@@ -76,11 +74,11 @@ func (s *step) Clone() *step {
 	n.baseDict = Dict{s.baseDict.Clone()}
 	n.metaPile = PrevPile{s.metaPile.Clone()}
 
-	if tmpl, err := s.rootTmpl.Clone(); err == nil {
+	tmpl, err := s.rootTmpl.Clone()
+	if all.Ok("Clone", "template", err) {
 		n.rootTmpl = Template{tmpl}
 	} else {
-		n.rootTmpl = NewTemplate(aDot) // text/template
-		all.Ok("Clone", "template", err)
+		panic(err)
 	}
 
 	n.dataTree = NewData(aDot) // TODO Clone?

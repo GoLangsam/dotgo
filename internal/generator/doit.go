@@ -6,8 +6,8 @@
 package gen
 
 import (
-	"github.com/golangsam/container/ccsafe/dotpath"
-	"github.com/golangsam/container/ccsafe/fileinfocache"
+	"github.com/GoLangsam/container/ccsafe/dotpath"
+	"github.com/GoLangsam/container/ccsafe/fileinfocache"
 )
 
 // DoIt performs it all:

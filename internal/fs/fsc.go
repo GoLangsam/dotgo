@@ -5,8 +5,8 @@
 package fs
 
 import (
-	"github.com/golangsam/container/ccsafe/fs"
-	"github.com/golangsam/dotgo/internal/fsc" // Fs Channels
+	"github.com/GoLangsam/container/ccsafe/fs"
+	"github.com/GoLangsam/dotgo/internal/fsc" // Fs Channels
 )
 
 // IfPrint helpers - using fsc: Fs Channels

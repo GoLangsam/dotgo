@@ -7,7 +7,7 @@ package fsc
 import (
 	"path/filepath"
 
-	"github.com/golangsam/container/ccsafe/fs"
+	"github.com/GoLangsam/container/ccsafe/fs"
 )
 
 // PipeFsFileGlob forks received fsfiles into directories and files according to fs.MatchDisk

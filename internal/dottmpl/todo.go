@@ -7,10 +7,10 @@ package dottmpl
 import (
 	"context"
 
-	a "github.com/golangsam/dotgo/internal/fsa" // adapter to file system analysis
+	a "github.com/GoLangsam/dotgo/internal/fsa" // adapter to file system analysis
 
-	"github.com/golangsam/container/ccsafe/dot"
-	"github.com/golangsam/do/cli/cancel"
+	"github.com/GoLangsam/container/ccsafe/dot"
+	"github.com/GoLangsam/do/cli/cancel"
 )
 
 type toDo struct {

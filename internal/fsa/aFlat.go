@@ -5,7 +5,7 @@
 package fsa
 
 import (
-	"github.com/golangsam/container/ccsafe/fs"
+	"github.com/GoLangsam/container/ccsafe/fs"
 )
 
 // AnalyseFlat returns the analysis rooted at *Fold without recursing into any subdirs

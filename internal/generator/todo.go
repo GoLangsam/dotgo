@@ -7,7 +7,7 @@ package gen
 import (
 	"context"
 
-	"github.com/golangsam/do/cli/cancel"
+	"github.com/GoLangsam/do/cli/cancel"
 )
 
 type toDo struct {

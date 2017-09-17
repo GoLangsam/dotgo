@@ -5,7 +5,7 @@
 package fsa
 
 import (
-	"github.com/golangsam/container/ccsafe/fs"
+	"github.com/GoLangsam/container/ccsafe/fs"
 )
 
 // Kind represents the kind of some analysis

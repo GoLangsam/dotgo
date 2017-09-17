@@ -5,7 +5,7 @@
 package dottmpl
 
 import (
-	f "github.com/golangsam/dotgo/internal/fs" // adapter to file system (via "container/ccsafe/fs"
+	f "github.com/GoLangsam/dotgo/internal/fs" // adapter to file system (via "container/ccsafe/fs"
 )
 
 // Write byteS into dirPath with name resolved against data

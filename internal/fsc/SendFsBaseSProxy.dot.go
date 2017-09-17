@@ -10,7 +10,8 @@ package fsc
 // Note: SendProxyFsBaseS imports "container/ring" for the expanding buffer.
 import (
 	"container/ring"
-	"github.com/golangsam/container/ccsafe/fs"
+
+	"github.com/GoLangsam/container/ccsafe/fs"
 )
 
 // FsBaseSCAP is the capacity of the buffered proxy channel
