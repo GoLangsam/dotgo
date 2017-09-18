@@ -13,11 +13,11 @@ import (
 func doer(do func()) Actor       { return Act(NewNull(), func(item string) { do() }) }
 func doit(do func(string)) Actor { return Act(NewNull(), func(item string) { do(item) }) }
 
-func (s *step) tmplParser() Actor {
+func (s *step) tmplParser(lookupCache func(string) string) Actor {
 	return Act(s.rootTmpl, func(item string) {
 
 		var err error
-		text := s.lookupData(item)
+		text := lookupCache(item)
 		name := nameLessExt(item)
 
 		_, err = s.rootTmpl.ParseName(name, text)
@@ -25,11 +25,11 @@ func (s *step) tmplParser() Actor {
 	})
 }
 
-func (s *step) metaReader(tmpl Template) Actor {
+func (s *step) metaReader(lookupCache func(string) string, tmpl Template) Actor {
 	return Act(tmpl, func(item string) {
 
 		var err error
-		text := s.lookupData(item)
+		text := lookupCache(item)
 		name := nameLessExt(item) + ".meta"
 
 		meta, err := Meta(text) // extract meta-data
@@ -47,7 +47,7 @@ func (s *step) readMeta(flag, verbose bool, header string) *step {
 
 	tmpl, err := s.rootTmpl.Clone() // Clone rootTmpl
 	if all.Ok("Clone", "Root", err) {
-		metaData := s.metaReader(Template{tmpl}) // text/template from meta
+		metaData := s.metaReader(s.lookupData, Template{tmpl}) // text/template from meta
 		s.metaPile.Walker(s.done, metaData)()    // meta => metaTmpl & metaData
 		metaData.flagPrint(flag, verbose, header)
 	}

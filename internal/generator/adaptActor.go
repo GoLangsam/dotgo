@@ -5,8 +5,8 @@
 package gen
 
 type Actor struct {
-	it Some   // Some collection
-	do itemDo // what to do to it
+	it   Some          // Some collection
+	do   itemDo        // what to do to it
 	done chan struct{} // done?
 }
 
