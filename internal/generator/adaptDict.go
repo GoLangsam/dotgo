@@ -5,7 +5,7 @@
 package gen
 
 import (
-	"github.com/golangsam/container/ccsafe/lsm"
+	"github.com/GoLangsam/container/ccsafe/lsm"
 )
 
 // Dict represents a dictionary

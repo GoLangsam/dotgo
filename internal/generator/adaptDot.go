@@ -5,7 +5,7 @@
 package gen
 
 import (
-	"github.com/golangsam/container/ccsafe/dot"
+	"github.com/GoLangsam/container/ccsafe/dot"
 )
 
 type Data struct {

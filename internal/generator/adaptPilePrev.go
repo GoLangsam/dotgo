@@ -5,7 +5,7 @@
 package gen
 
 import (
-	"github.com/golangsam/dotgo/internal/pile"
+	"github.com/GoLangsam/dotgo/internal/pile"
 )
 
 // prevPile represents a Pile traversed backward
