@@ -7,12 +7,14 @@ package gen
 type Actor struct {
 	it Some   // Some collection
 	do itemDo // what to do to it
+	done chan struct{} // done?
 }
 
 func Act(it Some, do itemDo) Actor {
 	return Actor{
 		it,
 		do,
+		make(chan struct{}),
 	}
 }
 
@@ -37,6 +39,10 @@ func (m Actor) Walker(quit func() bool, out ...Actor) func() {
 }
 
 // End implement Some
+
+func (m Actor) Done() <-chan struct{} {
+	return m.done
+}
 
 func ActorsClose(out ...Actor) {
 	for i := range out {
