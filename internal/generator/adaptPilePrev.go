@@ -47,14 +47,14 @@ func (p PrevPile) Walker(quit func() bool, out ...Actor) func() {
 // End implement Some
 
 func (p PrevPile) Action(is ...itemIs) Actor {
-	return Actor{p, func(item string) {
+	return Act(p, func(item string) {
 		for i := range is {
 			if is[i](item) {
 				p.Pile(item)
 				return
 			}
 		}
-	}}
+	})
 }
 
 // End implement SomeWithAction

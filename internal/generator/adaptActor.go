@@ -9,6 +9,13 @@ type Actor struct {
 	do itemDo // what to do to it
 }
 
+func Act(it Some, do itemDo) Actor {
+	return Actor{
+		it,
+		do,
+	}
+}
+
 // Beg implement Some
 
 // Len -

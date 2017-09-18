@@ -10,11 +10,11 @@ import (
 )
 
 // doer - just do something
-func doer(do func()) Actor       { return Actor{NewNull(), func(item string) { do() }} }
-func doit(do func(string)) Actor { return Actor{NewNull(), func(item string) { do(item) }} }
+func doer(do func()) Actor       { return Act(NewNull(), func(item string) { do() }) }
+func doit(do func(string)) Actor { return Act(NewNull(), func(item string) { do(item) }) }
 
 func (s *step) tmplParser() Actor {
-	return Actor{s.rootTmpl, func(item string) {
+	return Act(s.rootTmpl, func(item string) {
 
 		var err error
 		text := s.lookupData(item)
@@ -22,11 +22,11 @@ func (s *step) tmplParser() Actor {
 
 		_, err = s.rootTmpl.ParseName(name, text)
 		all.Ok("CollectTmpl: Parse:", name, err)
-	}}
+	})
 }
 
 func (s *step) metaReader(tmpl Template) Actor {
-	return Actor{tmpl, func(item string) {
+	return Act(tmpl, func(item string) {
 
 		var err error
 		text := s.lookupData(item)
@@ -40,7 +40,7 @@ func (s *step) metaReader(tmpl Template) Actor {
 
 		_, err = Apply(s.dataTree, tmpl, name)
 		all.Ok("CollectMeta: Apply:", name, err)
-	}}
+	})
 }
 
 func (s *step) readMeta(flag, verbose bool, header string) *step {
@@ -56,7 +56,7 @@ func (s *step) readMeta(flag, verbose bool, header string) *step {
 }
 
 func (s *step) apply(path string) Actor {
-	return Actor{s.rootTmpl, func(item string) {
+	return Act(s.rootTmpl, func(item string) {
 		flagPrintString(wd, "Apply", path+tab+arr+item)
 
 		// path - where we are
@@ -83,5 +83,5 @@ func (s *step) apply(path string) Actor {
 				}
 			}
 		}
-	}}
+	})
 }

@@ -39,14 +39,14 @@ func (n Null) Walker(quit func() bool, out ...Actor) func() {
 // End implement Some
 
 func (n Null) Action(is ...itemIs) Actor {
-	return Actor{n, func(item string) {
+	return Act(n, func(item string) {
 		for i := range is {
 			if is[i](item) {
 				fmt.Println(tab, item, tab, tab)
 				return
 			}
 		}
-	}}
+	})
 }
 
 // End implement SomeWithAction

@@ -48,14 +48,14 @@ func (d Dict) Walker(quit func() bool, out ...Actor) func() {
 // End implement Some
 
 func (d Dict) Action(is ...itemIs) Actor {
-	return Actor{d, func(item string) {
+	return Act(d, func(item string) {
 		for i := range is {
 			if is[i](item) {
 				d.Assign(nameLessExt(item), nil)
 				return
 			}
 		}
-	}}
+	})
 }
 
 // End implement SomeWithAction
