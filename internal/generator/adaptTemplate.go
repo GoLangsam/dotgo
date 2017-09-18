@@ -5,7 +5,8 @@
 package gen
 
 import (
-	t "github.com/GoLangsam/dotgo/internal/texttmpl" // adapter to "text/template"
+	t "github.com/GoLangsam/dotgo/internal/template"
+	//"github.com/GoLangsam/dotgo/internal/texttmpl" // adapter to "text/template"
 	//"github.com/GoLangsam/dotgo/internal/htmltmpl" // adapter to "html/template"
 )
 
@@ -17,7 +18,7 @@ type Template struct {
 // NewTemplate returns a new template
 // with funcmap attached and delimiters set
 func NewTemplate(name string) Template {
-	return Template{t.New(name).Funcs(Funcs)}
+	return Template{t.NewTextTemplate(name).Funcs(Funcs)}
 }
 
 // Beg implement Some
