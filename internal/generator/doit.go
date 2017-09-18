@@ -54,6 +54,5 @@ func DoIt() error {
 		}
 	}
 
-	prep.wg.Wait() // wait for all
 	return prep.todo.ctx.Err()
 }

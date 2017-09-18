@@ -78,6 +78,7 @@ func (s *step) execDo(d DirS) *step {
 	for i := range d {
 		s = s.Clone().execDir(d[i].DirPath, d[i].Recurse)
 	}
+	s.wg.Wait() // wait for all
 
 	return s
 }
