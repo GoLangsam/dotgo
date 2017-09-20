@@ -20,22 +20,24 @@ const (
 	metaR = "-" + commR + tmplR // restrict comment to "-*/}}" for Meta-Comments
 )
 
-// Template defines what is used from "text/template"
+type FuncMap map[string]interface{}
+
+// Template represents the template used (html or text)
 type Template interface {
-	// // AddParseTree(name string, tree *parse.Tree) (*Template, error)
+	// // AddParseTree(name string, tree *parse.Tree) (Template, error)
 	Clone() (Template, error)
 	// // DefinedTemplates() string
-	// Delims(left, right string) *Template
+	// Delims(left, right string) Template
 	// Execute(wr io.Writer, data interface{}) error
 	ExecuteTemplate(wr io.Writer, name string, data interface{}) error
-	// Funcs(funcMap FuncMap) *Template
-	// Lookup(name string) *Template
+	Funcs(funcMap map[string]interface{}) Template
+	// Lookup(name string) Template
 	Name() string
 	New(name string) Template
-	// Option(opt ...string) *Template
+	// Option(opt ...string) Template
 	Parse(text string) (Template, error)
-	// ParseFiles(filenames ...string) (*Template, error)
-	// ParseGlob(pattern string) (*Template, error)
+	// ParseFiles(filenames ...string) (Template, error)
+	// ParseGlob(pattern string) (Template, error)
 	Templates() []Template
 }
 
