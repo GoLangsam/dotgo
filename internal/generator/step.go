@@ -52,7 +52,7 @@ func NewStep(lookupData func(string) string) *step {
 	s.filePile = NewNext(512, 128) // files (templates) to handle
 	s.metaPile = NewPrev(256, 000) // templates with non-empty meta: apply in reverse order!
 	s.baseDict = NewDict()         // templates to execute: basenames found
-	s.rootTmpl = NewTemplate(aDot) // text/template
+	s.rootTmpl = NewTextTemplate(aDot) // text/template
 	s.dataTree = NewData(aDot)     // data - a Dot
 	return s
 }

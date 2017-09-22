@@ -50,7 +50,7 @@ func (d Data) Walker(quit func() bool, out ...Actor) func() {
 func (d Data) FileName(name string) string {
 	id := "FileName"
 	fileName := name
-	template := NewTemplate(id)
+	template := NewTextTemplate(id)
 	tmpl, err := template.Parse(fileName)
 	if all.Ok("Parse", id, err) {
 		byteS, err := Apply(d, Template{tmpl}, id)

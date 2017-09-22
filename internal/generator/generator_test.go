@@ -14,7 +14,7 @@ var _ Some = Actor{}
 
 var _ Some = DirS{}
 var _ Some = NewData(aDot)
-var _ Some = NewTemplate(aDot)
+var _ Some = NewTextTemplate(aDot)
 
 var _ SomeWithAction = NewDict()
 var _ SomeWithAction = NewNull()
