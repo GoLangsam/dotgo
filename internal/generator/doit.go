@@ -5,6 +5,10 @@
 // package gen implements the agnostic template driven text & source generator
 package gen
 
+// TODO use an adaptive cache instead of fic
+// TODO dirS shall be absolute, if we intend to move os.Getwd during Exec
+// TODO support also html/template
+
 import (
 	"github.com/GoLangsam/container/ccsafe/dotpath"
 	"github.com/GoLangsam/container/ccsafe/fileinfocache"
@@ -15,8 +19,6 @@ import (
 //  - walk the file system (where to look)
 //  - collect metadata
 //  - execute relevant templates
-// TODO use an adaptive cache instead of fic
-// TODO dirS shall be absolute, if we intend to move os.Getwd during Exec
 func DoIt() error {
 
 	// Beg of Prolog
