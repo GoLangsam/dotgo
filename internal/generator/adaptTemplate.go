@@ -8,9 +8,7 @@ import (
 	"io"
 	"sort"
 
-	t "github.com/GoLangsam/dotgo/internal/template"
-	//"github.com/GoLangsam/dotgo/internal/texttmpl" // adapter to "text/template"
-	//"github.com/GoLangsam/dotgo/internal/htmltmpl" // adapter to "html/template"
+	t "github.com/GoLangsam/template"
 )
 
 const (
