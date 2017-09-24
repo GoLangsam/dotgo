@@ -9,14 +9,19 @@ import (
 )
 
 var (
-	a_, aa, ad, ar, at, af, an, am, ap     bool   // print analysis
-	aav, adv, arv, atv, afv, anv, amv, apv bool   // ...verbose
-	e_, ea, ed, em, et, el                 bool   // print exec
-	eav, edv, emv, etv, elv                bool   // ...verbose
-	w_, wd, wf, wr                         bool   // print write
-	wdv, wfv, wrv                          bool   // ...verbose
-	exe, ugo, nof, nox, nos                bool   // write
-	tmplread                               string // TODO change default (& exf) acc to new 'type'-switch: md txt wiki ...
+	a_, aa                            bool   // print analysis
+	ap, af, an, ad, am, ar, at        bool   // p f n d m r t
+	aav                               bool   // ...verbose
+	apv, afv, anv, adv, amv, arv, atv bool   // p f n d m r t
+	e_, el                            bool   // print exec
+	ep, ef, en, ed, em, er, et        bool   // p f n d m r t
+	elv                               bool   // ...verbose
+	epv, efv, env, edv, emv, erv, etv bool   // p f n d m r t
+	w_                                bool   // print write
+	wd, wf, wr                        bool   // dir file raw
+	wdv, wfv, wrv                     bool   // ...verbose
+	exe, nof, nox, nos, ugo           bool   // write no-format no-exec no-save ugly-go
+	tmplread                          string // TODO change default (& exf) acc to new 'type'-switch: md txt wiki ...
 )
 
 func init() {
@@ -26,34 +31,44 @@ func init() {
 
 	flag.BoolVar(&a_, "a", false, "print all analysis info:")
 	flag.BoolVar(&aa, "aa", false, "print analysis arguments(s)")
+	// p f n d m r t
 	flag.BoolVar(&ap, "ap", false, "print analysis path(s)")
 	flag.BoolVar(&af, "af", false, "print analysis files")
 	flag.BoolVar(&an, "an", false, "print analysis names")
-	flag.BoolVar(&am, "am", false, "print analysis meta files")
 	flag.BoolVar(&ad, "ad", false, "print analysis datatree")
+	flag.BoolVar(&am, "am", false, "print analysis meta files")
 	flag.BoolVar(&ar, "ar", false, "print analysis root template names")
 	flag.BoolVar(&at, "at", false, "print analysis meta template names")
 
 	flag.BoolVar(&aav, "aav", false, "...verbose")
+	// p f n d m r t
 	flag.BoolVar(&apv, "apv", false, "...verbose")
 	flag.BoolVar(&afv, "afv", false, "...verbose")
-	flag.BoolVar(&amv, "amv", false, "...verbose")
 	flag.BoolVar(&anv, "anv", false, "...verbose")
 	flag.BoolVar(&adv, "adv", false, "...verbose")
+	flag.BoolVar(&amv, "amv", false, "...verbose")
 	flag.BoolVar(&atv, "arv", false, "...verbose")
 	flag.BoolVar(&atv, "atv", false, "...verbose"+sep)
 
 	flag.BoolVar(&e_, "e", false, "print all execution info:")
-	flag.BoolVar(&ea, "ea", false, "print execution path(s)")
 	flag.BoolVar(&el, "el", false, "print execution line")
+	// p f n d m r t
+	flag.BoolVar(&ep, "ep", false, "print execution path(s)")
+	flag.BoolVar(&ef, "ef", false, "print execution files")
+	flag.BoolVar(&en, "en", false, "print execution names")
 	flag.BoolVar(&ed, "ed", false, "print execution datatree")
 	flag.BoolVar(&em, "em", false, "print execution meta files")
-	flag.BoolVar(&et, "et", false, "print execution template names")
+	flag.BoolVar(&er, "er", false, "print execution root template names")
+	flag.BoolVar(&et, "et", false, "print execution meta template names")
 
-	flag.BoolVar(&eav, "eav", false, "...verbose")
 	flag.BoolVar(&elv, "elv", false, "...verbose")
+	// p f n d m r t
+	flag.BoolVar(&epv, "epv", false, "...verbose")
+	flag.BoolVar(&efv, "efv", false, "...verbose")
+	flag.BoolVar(&env, "env", false, "...verbose")
 	flag.BoolVar(&edv, "edv", false, "...verbose")
 	flag.BoolVar(&emv, "emv", false, "...verbose")
+	flag.BoolVar(&erv, "erv", false, "...verbose")
 	flag.BoolVar(&etv, "etv", false, "...verbose"+sep)
 
 	flag.BoolVar(&w_, "w", false, "print all writing info:")
@@ -66,7 +81,7 @@ func init() {
 	flag.BoolVar(&wrv, "wrv", false, "...verbose"+sep)
 
 	flag.BoolVar(&nof, "nof", false, "no formatting - do not apply go/format to raw text")
-	flag.BoolVar(&nos, "nos", false, "no safe - print resulting text only")
+	flag.BoolVar(&nos, "nos", false, "no save - print resulting text only")
 	flag.BoolVar(&nox, "nox", false, "no execute - terminate after main analysis"+sep)
 
 	flag.BoolVar(&exe, "x", false, "execute: safe resulting text")
@@ -95,14 +110,9 @@ func flagParse() {
 	if aav {
 		aa = true
 	}
-	if adv {
-		ad = true
-	}
-	if arv {
-		ar = true
-	}
-	if atv {
-		at = true
+	// p f n d m r t
+	if apv {
+		ap = true
 	}
 	if afv {
 		af = true
@@ -110,15 +120,31 @@ func flagParse() {
 	if anv {
 		an = true
 	}
+	if adv {
+		ad = true
+	}
 	if amv {
 		am = true
 	}
-	if apv {
-		ap = true
+	if arv {
+		ar = true
+	}
+	if atv {
+		at = true
 	}
 
-	if eav {
-		ea = true
+	if elv {
+		el = true
+	}
+	// p f n d m r t
+	if epv {
+		ep = true
+	}
+	if efv {
+		ef = true
+	}
+	if env {
+		en = true
 	}
 	if edv {
 		ed = true
@@ -126,17 +152,16 @@ func flagParse() {
 	if emv {
 		em = true
 	}
-	if etv {
+	if erv {
 		et = true
 	}
-	if elv {
-		el = true
+	if erv {
+		et = true
 	}
 
 	if wdv {
 		wd = true
 	}
-
 	if wfv {
 		wf = true
 	}
@@ -145,16 +170,24 @@ func flagParse() {
 	}
 
 	if a_ {
-		aa, ap, af, an, am, ad, ar, at = true, true, true, true, true, true, true, true
+		aa = true
+		// p f n d m r t
+		ap, af, an, ad, am, ar, at = true, true, true, true, true, true, true
 		a_ = false
-	} else if !(aa || ap || af || an || am || ad || ar || at) {
+	} else if !(aa ||
+		// p f n d m r t
+		ap || af || an || ad || am || ar || at) {
 		a_ = true
 	}
 
 	if e_ {
-		ea, ed, em, el, et = true, true, true, true, true
+		el = true
+		// p f n d m r t
+		ep, ef, en, ed, em, er, et = true, true, true, true, true, true, true
 		e_ = false
-	} else if !(ea || ed || em || el || et) {
+	} else if !(el ||
+		// p f n d m r t
+		ep || ef || en || ed || em || er || et) {
 		e_ = true
 	}
 

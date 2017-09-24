@@ -48,7 +48,7 @@ func (s *step) readMeta(flag, verbose bool, header string) *step {
 	tmpl, err := s.rootTmpl.Clone() // Clone rootTmpl
 	if all.Ok("Clone", "Root", err) {
 		metaData := s.metaReader(s.lookupData, Template{tmpl}) // text/template from meta
-		s.metaPile.Walker(s.done, metaData)()    // meta => metaTmpl & metaData
+		s.metaPile.Walker(s.done, metaData)()                  // meta => metaTmpl & metaData
 		metaData.flagPrint(flag, verbose, header)
 	}
 
@@ -57,7 +57,7 @@ func (s *step) readMeta(flag, verbose bool, header string) *step {
 
 func (s *step) apply(path string) Actor {
 	return Act(s.rootTmpl, func(item string) {
-		flagPrintString(wd, "Apply", path+tab+arr+item)
+		flagPrintString(wd, "wd-Exec:", path+tab+arr+item)
 
 		// path - where we are
 		// item - template name
@@ -67,7 +67,7 @@ func (s *step) apply(path string) Actor {
 			node := Data{node}
 			byteS, err := Apply(node, s.rootTmpl, item)
 			if all.Ok("Execute", item, err) {
-				flagPrintByteS(wr, byteS, ">>>>Raw text of "+item+" & "+name)
+				flagPrintByteS(wr, byteS, "wr-Raw :\t >>>>Raw text of "+item+" & "+name)
 				if ugo {
 					filename := filepath.Join(path, node.FileName(nameLessExt(item)+".ugo"))
 					all.Ok("Write Raw", filename, ioutil.WriteFile(filename, byteS, 0644))
@@ -76,7 +76,7 @@ func (s *step) apply(path string) Actor {
 					byteS, err = Source(byteS)
 					all.Ok("Format", item, err)
 				}
-				flagPrintByteS(wf || nos, byteS, ">>>>Final text of "+item+" & "+name)
+				flagPrintByteS(wf || nos, byteS, "wf-File:\t >>>>Final text of "+item+" & "+name)
 				filename := filepath.Join(path, node.FileName(item))
 				if exe {
 					all.Ok("Write", filename, ioutil.WriteFile(filename, byteS, 0644))

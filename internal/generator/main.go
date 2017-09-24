@@ -56,14 +56,84 @@ func (s *step) prepDo(d DirS) *step {
 	return s
 }
 
-func (s *step) prepPrint() *step {
+func (s *step) execDo(d DirS) *step {
+	d.flagPrint(ep, epv, "ep-Path:")
 
+	for i := range d {
+		s.do(func() { s.Clone().execDir(d[i].DirPath, d[i].Recurse) })
+	}
+	return s
+}
+
+func (s *step) execDir(path string, recurse bool) *step {
+
+	flagFile := doer(func() { flagDot(e_, ".") })
+	s.do(
+		s.filePile.Walker(s.done, flagFile, // go file =>
+			s.tmplParser(s.lookupData),   // rootTmpl
+			s.metaPile.Action(s.hasMeta), // meta (*this* works!?!)
+			s.baseDict.Action(s.isBase),  // base
+		))
+
+	entries, err := ioutil.ReadDir(path)
+	if all.Ok("ReadDir", path, err) {
+
+		subDirS := []string{}
+		hasExecFiles := false
+
+		for _, entry := range entries {
+			name := entry.Name()
+			path := filepath.Join(path, name)
+
+			if entry.IsDir() {
+				if recurse && !IsDotNonsense(name) { // No .git or other dot nonsense please.
+					subDirS = append(subDirS, path)
+				}
+			} else {
+				if s.isFile(name) {
+					s.filePile.Pile(path)
+				}
+				if !hasExecFiles && s.isExec(name) {
+					hasExecFiles = true
+				}
+			}
+		}
+		s.filePile.Close()
+		<-s.metaPile.Done() // go meta => drain
+
+		for _, path := range subDirS {
+			path := path
+			s.do(func() { s.Clone().execDir(path, recurse) })
+		}
+
+		if hasExecFiles && !nox {
+			path := path
+			s.do(func() { s.execPath(path) })
+		}
+	}
+	return s
+}
+
+// execPath - apply each template 'name' and show/format/write result
+func (s *step) execPath(path string) {
+
+	s = s.execReadMetaAndPrint(path)
+
+	exec := s.apply(path) // apply templates
+	s.do(s.baseDict.Walker(s.done, exec))
+}
+
+// ReadMetaAndPrint
+
+func (s *step) prepReadMetaAndPrint() *step {
+
+	// p f n d m r t => ?p f m n r t d
 	s.filePile.flagPrint(af, afv, "af-File:")
 	s.metaPile.flagPrint(am, amv, "am-Meta:")
 	s.baseDict.flagPrint(an, anv, "an-Name:")
 	s.rootTmpl.flagPrint(ar, arv, "ar-Root:")
 
-	if ad || at {
+	if ad || at { // temporary meta data - just to show
 		s = s.readMeta(at, atv, "at-Data:")
 		s.dataTree.flagPrint(ad, adv, "ad-"+aDot+aDot+aDot+aDot+":")
 		s.dataTree = NewData(aDot) // forget
@@ -72,90 +142,17 @@ func (s *step) prepPrint() *step {
 	return s
 }
 
-func (s *step) execDo(d DirS) *step {
-	d.flagPrint(ea, eav, "ea-Exec:")
+func (s *step) execReadMetaAndPrint(path string) *step {
+	// p f n d m r t => p f m n r t d
+	flagPrintString(epv, path, "Directory")
 
-	for i := range d {
-		s = s.Clone().execDir(d[i].DirPath, d[i].Recurse)
-	}
-	s.wg.Wait() // wait for all
-
-	return s
-}
-
-func (s *step) execDir(path string, recurse bool) *step {
-
-	subDirS := []string{}
-
-	flagFile := doer(func() { flagDot(e_, ".") })
-
-	s.do(
-		s.filePile.Walker(s.done, flagFile, // go file =>
-			s.tmplParser(s.lookupData),   // rootTmpl
-			s.metaPile.Action(s.hasMeta), // meta (*this* works!?!)
-			s.baseDict.Action(s.isBase),  // base
-		))
-
-	hasExecFiles := false
-	entries, err := ioutil.ReadDir(path)
-	if all.Ok("ReadDir", path, err) {
-		for _, entry := range entries {
-			name := entry.Name()
-			path := filepath.Join(path, name)
-
-			if !entry.IsDir() {
-				if !hasExecFiles && s.isExec(name) {
-					hasExecFiles = true
-				}
-				if s.isFile(name) {
-					s.filePile.Pile(path)
-				}
-				/*
-					if s.isBase(name) {
-						s.baseDict.Assign(path, nil)
-					}
-				*/
-				continue
-			}
-			// Entry is a directory.
-			if recurse && !IsDotNonsense(name) { // No .git or other dot nonsense please.
-				subDirS = append(subDirS, path)
-			}
-		}
-		s.filePile.Close()
-		<-s.metaPile.Done() // go meta => drain
-		// s.todo.wg.Wait()    // wait for all
-
-		s.metaPile.flagPrint(em, emv, "em-Meta")
-
-		for _, path := range subDirS {
-			path := path
-			s := s.Clone()
-			f := func() { s.execDir(path, recurse) }
-			s.do(f)
-		}
-
-		if hasExecFiles && !nox {
-			s.execPath(path)
-		}
-	}
-	return s
-}
-
-// execPath - apply each template 'name' and show/format/write result
-func (s *step) execPath(path string) *step {
-
-	flagPrintString(ea, path, "Directory")
+	s.filePile.flagPrint(ef, efv, "ef-File:")
+	s.metaPile.flagPrint(em, emv, "em-Meta:")
+	s.baseDict.flagPrint(en, env, "en-Name:")
+	s.rootTmpl.flagPrint(er, erv, "er-Root:")
 
 	s = s.readMeta(et, etv, "et-Data:")
 	s.dataTree.flagPrint(ed, edv, "ed-Data: "+path)
-
-	exec := s.apply(path) // apply templates
-	s.do(
-		s.baseDict.Walker(
-			s.done,
-			exec,
-		)) // go base => apply
 
 	return s
 }
