@@ -40,7 +40,7 @@ func DoIt() error {
 
 	if !prep.done() && len(prepDirS) > 0 {
 		analyse := flagOpen(a_, "Prepare")
-		prep = prep.prepDo(prepDirS).prepPrint()
+		prep = prep.prepDo(prepDirS)
 		flagClose(a_, analyse)
 		if all.NotOk("Prepare Main:") {
 			return prep.todo.ctx.Err() // abort

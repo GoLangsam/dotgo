@@ -43,18 +43,6 @@ func (s *step) metaReader(lookupCache func(string) string, tmpl Template) Actor 
 	})
 }
 
-func (s *step) readMeta(flag, verbose bool, header string) *step {
-
-	tmpl, err := s.rootTmpl.Clone() // Clone rootTmpl
-	if all.Ok("Clone", "Root", err) {
-		metaData := s.metaReader(s.lookupData, Template{tmpl}) // text/template from meta
-		s.metaPile.Walker(s.done, metaData)()                  // meta => metaTmpl & metaData
-		metaData.flagPrint(flag, verbose, header)
-	}
-
-	return s
-}
-
 func (s *step) apply(path string) Actor {
 	return Act(s.rootTmpl, func(item string) {
 		flagPrintString(wd, "wd-Exec:", path+tab+arr+item)
