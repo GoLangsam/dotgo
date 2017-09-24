@@ -4,11 +4,6 @@
 
 package gen
 
-import (
-	"io/ioutil"
-	"path/filepath"
-)
-
 func (s *step) prepDo(d DirS) *step {
 	d.flagPrint(ap, apv, "ap-Prep:")
 
