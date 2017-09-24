@@ -18,6 +18,7 @@ const (
 	commR = "*/" // comment block end
 )
 
+// template defines what is *really* used from t.Template
 type template interface {
 	// // AddParseTree(name string, tree *parse.Tree) (Template, error)
 	Clone() (t.Template, error)
@@ -25,11 +26,11 @@ type template interface {
 	// Delims(left, right string) Template
 	// Execute(wr io.Writer, data interface{}) error
 	ExecuteTemplate(wr io.Writer, name string, data interface{}) error
-	Funcs(funcMap map[string]interface{}) t.Template
+	// Funcs(funcMap map[string]interface{}) t.Template
 	// Lookup(name string) Template
 	Name() string
 	New(name string) t.Template
-	Option(opt ...string) t.Template
+	// Option(opt ...string) t.Template
 	Parse(text string) (t.Template, error)
 	// ParseFiles(filenames ...string) (Template, error)
 	// ParseGlob(pattern string) (Template, error)
@@ -38,7 +39,7 @@ type template interface {
 
 // Template represents the template used (html or text)
 type Template struct {
-	template
+	template // t.Template
 }
 
 // NewTemplate returns a new template
