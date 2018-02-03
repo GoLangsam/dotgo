@@ -65,3 +65,8 @@ Thus, soon after having `dotgo` public and stable, there shall be it's companion
 When I chose the name `dotgo` I was not aware of the website [dotgo.eu](https://www.dotgo.eu/) and it's related events.
 Please accepty my apologies if this creates any kind of confusion in Your mind.
 And *Yes* - I may deserve blames and flames not having taken time to research the name beforehand ...
+
+## Support on Beerpay
+Hey dude! Help me out for a couple of :beers:!
+
+[![Beerpay](https://beerpay.io/GoLangsam/dotgo/badge.svg?style=beer-square)](https://beerpay.io/GoLangsam/dotgo)  [![Beerpay](https://beerpay.io/GoLangsam/dotgo/make-wish.svg?style=flat-square)](https://beerpay.io/GoLangsam/dotgo?focus=wish)
