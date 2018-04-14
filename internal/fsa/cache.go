@@ -5,8 +5,8 @@
 package fsa
 
 import (
-	"github.com/golangsam/container/ccsafe/fs"
-	"github.com/golangsam/container/ccsafe/fscache"
+	"github.com/GoLangsam/container/ccsafe/fs"
+	"github.com/GoLangsam/container/ccsafe/fscache"
 )
 
 // These variables support the file system analysis.

@@ -5,8 +5,8 @@
 package dottmpl
 
 import (
-	"github.com/golangsam/container/ccsafe/fscache"
-	f "github.com/golangsam/dotgo/internal/fs" // adapter to file system (via "container/ccsafe/fs"
+	"github.com/GoLangsam/container/ccsafe/fscache"
+	f "github.com/GoLangsam/dotgo/internal/fs" // adapter to file system (via "container/ccsafe/fs"
 )
 
 var (

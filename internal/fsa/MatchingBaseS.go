@@ -5,7 +5,7 @@
 package fsa
 
 import (
-	"github.com/golangsam/container/ccsafe/fs"
+	"github.com/GoLangsam/container/ccsafe/fs"
 )
 
 // MatchingBaseS returns the base names matching the patterns

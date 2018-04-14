@@ -5,7 +5,7 @@
 package fsa
 
 import (
-	"github.com/golangsam/container/ccsafe/fs"
+	"github.com/GoLangsam/container/ccsafe/fs"
 )
 
 // MatchingFileS returns the file names matching the patterns

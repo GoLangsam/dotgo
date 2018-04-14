@@ -6,8 +6,8 @@
 package args
 
 import (
-	"github.com/golangsam/container/ccsafe/dotpath"
-	"github.com/golangsam/container/ccsafe/fs"
+	"github.com/GoLangsam/container/ccsafe/dotpath"
+	"github.com/GoLangsam/container/ccsafe/fs"
 )
 
 // ToFolds uses dotpath to convert args to fs.FsFoldS - with or without recurse flag

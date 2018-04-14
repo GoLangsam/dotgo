@@ -5,8 +5,8 @@
 package dottmpl
 
 import (
-	t "github.com/golangsam/dotgo/internal/texttmpl" // adapter to "text/template"
-	//"github.com/golangsam/dotgo/internal/htmltmpl" // adapter to "html/template"
+	t "github.com/GoLangsam/dotgo/internal/texttmpl" // adapter to "text/template"
+	//"github.com/GoLangsam/dotgo/internal/htmltmpl" // adapter to "html/template"
 )
 
 // Template represents the template used (html or text)

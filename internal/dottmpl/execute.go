@@ -5,7 +5,7 @@
 package dottmpl
 
 import (
-	a "github.com/golangsam/dotgo/internal/fsa" // adapter to file system analysis
+	a "github.com/GoLangsam/dotgo/internal/fsa" // adapter to file system analysis
 )
 
 // Execute - given the current (= last) directory

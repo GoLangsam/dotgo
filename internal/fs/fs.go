@@ -6,7 +6,7 @@
 package fs
 
 import (
-	"github.com/golangsam/container/ccsafe/fs"
+	"github.com/GoLangsam/container/ccsafe/fs"
 )
 
 // NewFile returns new a *File with given name/path
