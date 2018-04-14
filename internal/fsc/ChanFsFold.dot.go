@@ -8,7 +8,7 @@ package fsc
 // DO NOT EDIT - Improve the pattern!
 
 import (
-	"github.com/golangsam/container/ccsafe/fs"
+	"github.com/GoLangsam/container/ccsafe/fs"
 )
 
 // MakeFsFoldChan returns a new open channel
