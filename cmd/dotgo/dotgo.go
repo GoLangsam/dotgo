@@ -7,7 +7,7 @@ package main
 import (
 	"fmt"
 
-	doit "github.com/golangsam/dotgo/internal/dottmpl"
+	doit "github.com/GoLangsam/dotgo/internal/dottmpl"
 )
 
 func main() {
