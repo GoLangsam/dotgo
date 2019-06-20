@@ -66,6 +66,13 @@ When I chose the name `dotgo` I was not aware of the website [dotgo.eu](https://
 Please accepty my apologies if this creates any kind of confusion in Your mind.
 And *Yes* - I may deserve blames and flames not having taken time to research the name beforehand ...
 
+---
+Your suggestions, remarks, questions and/or contributions are welcome ;-)
+
+---
+## Think deep - code happy - be simple - see clear :-)
+
+---
 ## Support on Beerpay
 Hey dude! Help me out for a couple of :beers:!
 
