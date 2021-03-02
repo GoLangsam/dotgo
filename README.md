@@ -5,6 +5,7 @@ An agnostic tool to create `*.go` sources (and other text) given some template(s
 [![Go Report Card](https://goreportcard.com/badge/github.com/GoLangsam/dotgo)](https://goreportcard.com/report/github.com/GoLangsam/dotgo)
 [![Build Status](https://travis-ci.org/GoLangsam/dotgo.svg?branch=master)](https://travis-ci.org/GoLangsam/dotgo)
 [![GoDoc](https://godoc.org/github.com/GoLangsam/dotgo?status.svg)](https://godoc.org/github.com/GoLangsam/dotgo)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FGoLangsam%2Fdotgo.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FGoLangsam%2Fdotgo?ref=badge_shield)
 
 ## Simplicity ain't easy
 
@@ -77,3 +78,6 @@ Your suggestions, remarks, questions and/or contributions are welcome ;-)
 Hey dude! Help me out for a couple of :beers:!
 
 [![Beerpay](https://beerpay.io/GoLangsam/dotgo/badge.svg?style=beer-square)](https://beerpay.io/GoLangsam/dotgo)  [![Beerpay](https://beerpay.io/GoLangsam/dotgo/make-wish.svg?style=flat-square)](https://beerpay.io/GoLangsam/dotgo?focus=wish)
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FGoLangsam%2Fdotgo.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FGoLangsam%2Fdotgo?ref=badge_large)
